@@ -1,0 +1,14 @@
+{# The visitors' book: what the colleagues passing by left, newest first, and the form. #}
+{% extends 'layout1.html.twig' %}
+
+{% block title %}{{ '@blog.book.title'|trans }}{% endblock %}
+{% block description %}{{ '@blog.book.lead'|trans }}{% endblock %}
+
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('bundles/blog/css/blog.css') }}">{% endblock %}
+
+{% block content %}
+<section class="blog blog-book">
+    <header class="blog-head"><div><p class="blog-eyebrow">{{ '@blog.book.eyebrow'|trans }}</p><h1>{{ '@blog.book.title'|trans }}</h1><p class="blog-lead">{{ '@blog.book.lead'|trans }}</p></div></header>
+    {% include '@Blog/client/_comments.html.twig' with {post: null, comments: comments, comment_form: comment_form|default(null), heading: false} %}
+</section>
+{% endblock %}

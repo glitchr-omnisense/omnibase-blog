@@ -1,0 +1,11 @@
+{# One comment: who, when, what; "répondre" on the top-level ones while the form is open - to those who may reply; the others are shown the door. #}
+<article class="blog-comment-body">
+    <header>
+        <b class="blog-comment-name">{% if comment.website %}<a href="{{ comment.website }}" rel="nofollow ugc noopener" target="_blank">{{ comment.displayName }}</a>{% else %}{{ comment.displayName }}{% endif %}</b>
+        {% if comment.author and comment.author.roles|filter(r => r != 'ROLE_USER')|length %}<span class="blog-pill is-author">{{ '@blog.comment.author'|trans }}</span>{% endif %}
+        <time datetime="{{ comment.createdAt|date('c') }}">{{ comment.createdAt|format_datetime('long', 'short') }}</time>
+    </header>
+    <p>{{ comment.content|nl2br }}</p>
+    {% if open %}<button type="button" class="blog-reply" data-blog-reply="{{ comment.id }}" data-blog-reply-name="{{ comment.displayName }}">{{ '@blog.comment.reply'|trans }}</button>
+    {% elseif sign_in_to_reply ?? false %}<a class="blog-reply is-door" href="{{ path('security_login') }}">{{ '@blog.comment.reply_signed_in'|trans }}</a>{% endif %}
+</article>

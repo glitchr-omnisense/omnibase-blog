@@ -1,0 +1,74 @@
+{#
+ # The comments of a post (or of the visitors' book: post = null), one after
+ # the other, the replies a step in, and the form. A host page includes it
+ # with {post: null} for the book; `comments` and `comment_form` are taken
+ # from the blog when the page does not pass them.
+ #}
+{% set comments = comments|default(blog_comments(post)) %}
+{% set open = blog_comments_open(post) %}
+{# Anyone writes a word; answering one takes an account (blog.comments.guest_replies). #}
+{% set can_reply = open and blog_can_reply() %}
+{% set form = comment_form|default(open ? blog_comment_form(post) : null) %}
+<section class="blog-comments" id="commentaires">
+    {% if heading is not defined or heading %}
+    <h2>{{ '@blog.comment.title'|trans({count: comments|length}) }}</h2>
+    {% endif %}
+
+    {% for message in app.flashes('blog') %}
+    <p class="blog-flash">{{ ('@blog.' ~ message)|trans }}</p>
+    {% endfor %}
+
+    {% if comments %}
+    <ol class="blog-comment-list">
+        {% for comment in comments %}
+        <li class="blog-comment" id="commentaire-{{ comment.id }}">
+            {% include '@Blog/client/_comment.html.twig' with {comment: comment, open: can_reply, sign_in_to_reply: open and not can_reply} %}
+            {% set replies = comment.replies|filter(r => r.visible) %}
+            {% if replies|length %}
+            <ol class="blog-comment-replies">
+                {% for reply in replies %}<li class="blog-comment is-reply" id="commentaire-{{ reply.id }}">{% include '@Blog/client/_comment.html.twig' with {comment: reply, open: false} %}</li>{% endfor %}
+            </ol>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ol>
+    {% else %}
+    <p class="blog-comments-empty">{{ '@blog.comment.empty'|trans }}</p>
+    {% endif %}
+
+    {% if form %}
+    <div class="blog-comment-form" id="commenter">
+        {{ form_start(form, {attr: {class: 'blog-form', novalidate: 'novalidate'}}) }}
+            {{ form_errors(form) }}
+            <p class="blog-replying" data-blog-replying hidden>{{ '@blog.comment.form.replying'|trans }} <b data-blog-replying-name></b> · <button type="button" data-blog-cancel-reply>{{ '@blog.comment.form.cancel_reply'|trans }}</button></p>
+            {{ form_widget(form.content) }}{{ form_errors(form.content) }}
+            <div class="blog-form-line">
+                {% if form.name is defined %}{{ form_widget(form.name) }}{{ form_errors(form.name) }}{{ form_widget(form.email) }}{{ form_errors(form.email) }}{% endif %}
+                <button type="submit" class="blog-button">{{ '@blog.comment.form.submit'|trans }}</button>
+            </div>
+            {{ form_row(form.url) }}
+            {{ form_row(form.parent) }}
+            {{ form_row(form.opened) }}
+            {% if form.captcha is defined %}{{ form_row(form.captcha) }}{% endif %}
+            <p class="blog-form-note">{{ '@blog.comment.form.note'|trans }}</p>
+        {{ form_end(form) }}
+    </div>
+    {% elseif not open %}
+    <p class="blog-comments-closed">{{ '@blog.comment.closed'|trans }}</p>
+    {% endif %}
+</section>
+<script>
+(function () {
+    // "Répondre": the reply goes under the comment pressed (the hidden parent field), the form scrolled to.
+    var form = document.querySelector('.blog-comment-form form');
+    if (!form) return;
+    var parent = form.querySelector('[name$="[parent]"]'), note = form.querySelector('[data-blog-replying]'), name = form.querySelector('[data-blog-replying-name]');
+    document.querySelectorAll('[data-blog-reply]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            parent.value = button.dataset.blogReply; name.textContent = button.dataset.blogReplyName; note.hidden = false;
+            form.scrollIntoView({behavior: 'smooth', block: 'start'}); form.querySelector('textarea').focus();
+        });
+    });
+    form.querySelector('[data-blog-cancel-reply]').addEventListener('click', function () { parent.value = ''; note.hidden = true; });
+})();
+</script>

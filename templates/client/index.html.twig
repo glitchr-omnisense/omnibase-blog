@@ -1,0 +1,71 @@
+{#
+ # The chronicles, a page at a time: the featured (or newest) post first and
+ # larger, then the cards, the topics to filter by, the months of the archive.
+ # The host's layout1.html.twig gives the chrome; blog.css the look.
+ #}
+{% extends 'layout1.html.twig' %}
+
+{% block title %}{{ month is defined ? '@blog.index.month_title'|trans({month: month|format_datetime(pattern: 'LLLL yyyy')|capitalize}) : (topic ? '@blog.index.topic_title'|trans({topic: topic}) : '@blog.index.title'|trans) }}{% endblock %}
+{% block description %}{{ '@blog.index.description'|trans }}{% endblock %}
+
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('bundles/blog/css/blog.css') }}">{% endblock %}
+
+{% block content %}
+<section class="blog blog-index">
+    <header class="blog-head">
+        <div>
+            <p class="blog-eyebrow">{{ '@blog.index.eyebrow'|trans }}</p>
+            <h1>{{ month is defined ? month|format_datetime(pattern: 'LLLL yyyy')|capitalize : (topic ? topic : '@blog.index.title'|trans) }}</h1>
+            <p class="blog-lead">{{ '@blog.index.lead'|trans }}</p>
+        </div>
+        <a class="blog-feed" href="{{ path('blog_feed') }}" title="RSS"><i class="fa-solid fa-rss" aria-hidden="true"></i> RSS</a>
+    </header>
+
+    {% if topics %}
+    <nav class="blog-topics" aria-label="{{ '@blog.index.topics'|trans }}">
+        <a href="{{ path('blog_index') }}" {{ not topic ? 'aria-current="page"' }}>{{ '@blog.index.all'|trans }}</a>
+        {% for t in topics %}<a href="{{ path('blog_index', {sujet: t.slug}) }}" {{ topic == t.slug ? 'aria-current="page"' }}>{{ t.label }}</a>{% endfor %}
+    </nav>
+    {% endif %}
+
+    {% if headline %}
+    <article class="blog-card is-headline">
+        {% if headline.cover %}<a class="blog-card-cover" href="{{ path('blog_post', {slug: headline.slug}) }}"><img src="{{ headline.cover }}" alt="" loading="lazy"></a>{% endif %}
+        <div class="blog-card-body">
+            <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' with {post: headline} %}</p>
+            <h2><a href="{{ path('blog_post', {slug: headline.slug}) }}">{{ headline.title }}</a></h2>
+            {% if headline.headline %}<p class="blog-card-headline">{{ headline.headline }}</p>{% endif %}
+            {% if headline.excerpt %}<p>{{ headline.excerpt }}</p>{% endif %}
+            <a class="blog-more" href="{{ path('blog_post', {slug: headline.slug}) }}">{{ '@blog.index.read'|trans }} <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+        </div>
+    </article>
+    {% endif %}
+
+    {% if posts %}
+    <div class="blog-grid">
+        {% for post in posts %}{% include '@Blog/client/_card.html.twig' %}{% endfor %}
+    </div>
+    {% elseif not headline %}
+    <p class="blog-empty">{{ '@blog.index.empty'|trans }}</p>
+    {% endif %}
+
+    {% if pages > 1 %}
+    <nav class="blog-pager" aria-label="{{ '@blog.index.pages'|trans }}">
+        {% if page > 1 %}<a rel="prev" href="{{ path('blog_index', {page: page - 1 > 1 ? page - 1 : null, sujet: topic, classe: taxon}) }}">‹ {{ '@blog.index.newer'|trans }}</a>{% endif %}
+        <span>{{ page }} / {{ pages }}</span>
+        {% if page < pages %}<a rel="next" href="{{ path('blog_index', {page: page + 1, sujet: topic, classe: taxon}) }}">{{ '@blog.index.older'|trans }} ›</a>{% endif %}
+    </nav>
+    {% endif %}
+
+    {% if months %}
+    <aside class="blog-archive">
+        <h2>{{ '@blog.index.archive'|trans }}</h2>
+        {% for year, byMonth in months %}
+        <p><strong>{{ year }}</strong>
+            {% for m in byMonth|keys|sort|reverse %}<a href="{{ path('blog_month', {year: year, month: m}) }}">{{ ('2000-' ~ m ~ '-01')|date('U')|format_datetime(pattern: 'LLLL')|capitalize }} <small>({{ byMonth[m] }})</small></a>{% endfor %}
+        </p>
+        {% endfor %}
+    </aside>
+    {% endif %}
+</section>
+{% endblock %}

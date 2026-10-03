@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+    <title>{{ site.name|default(app.request.httpHost) }} — {{ '@blog.index.title'|trans }}</title>
+    <link>{{ url('blog_index') }}</link>
+    <atom:link href="{{ url('blog_feed') }}" rel="self" type="application/rss+xml"/>
+    <description>{{ '@blog.index.description'|trans }}</description>
+    <language>{{ app.request.locale }}</language>
+    {% for post in posts %}
+    <item>
+        <title>{{ post.title }}</title>
+        <link>{{ url('blog_post', {slug: post.slug}) }}</link>
+        <guid isPermaLink="true">{{ url('blog_post', {slug: post.slug}) }}</guid>
+        <pubDate>{{ post.publishedAt|date('r') }}</pubDate>
+        <description>{{ (post.excerpt ?? post.headline ?? '')|escape }}</description>
+    </item>
+    {% endfor %}
+</channel>
+</rss>

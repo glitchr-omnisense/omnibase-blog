@@ -1,0 +1,28 @@
+{# One chronicle: its cover, its text (EditorJS or HTML, through omnibase's |wysiwyg), its neighbours, its comments. #}
+{% extends 'layout1.html.twig' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+{% block description %}{{ post.excerpt ?? post.headline ?? '' }}{% endblock %}
+{% block type %}article{% endblock %}
+
+{% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('bundles/blog/css/blog.css') }}">{% endblock %}
+
+{% block content %}
+<article class="blog blog-post">
+    <header class="blog-post-head">
+        <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' %}</p>
+        <h1>{{ post.title }}</h1>
+        {% if post.headline %}<p class="blog-lead">{{ post.headline }}</p>{% endif %}
+        {% if post.owners|length %}<p class="blog-byline">{{ '@blog.post.by'|trans({name: post.owners|first}) }}</p>{% endif %}
+    </header>
+    {% if post.cover %}<figure class="blog-post-cover"><img src="{{ post.cover }}" alt=""></figure>{% endif %}
+    <div class="blog-prose">{{ post.content|wysiwyg|raw }}</div>
+
+    <nav class="blog-neighbours" aria-label="{{ '@blog.post.neighbours'|trans }}">
+        {% if newer %}<a rel="prev" href="{{ path('blog_post', {slug: newer.slug}) }}"><small>{{ '@blog.post.newer'|trans }}</small><span>{{ newer.title }}</span></a>{% else %}<span></span>{% endif %}
+        {% if older %}<a rel="next" href="{{ path('blog_post', {slug: older.slug}) }}"><small>{{ '@blog.post.older'|trans }}</small><span>{{ older.title }}</span></a>{% endif %}
+    </nav>
+
+    {% include '@Blog/client/_comments.html.twig' with {post: post, comments: comments, comment_form: comment_form|default(null)} %}
+</article>
+{% endblock %}

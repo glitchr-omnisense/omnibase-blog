@@ -1,0 +1,5 @@
+{# The line under a title: the date, the reading time, the taxa and tags as pills. #}
+<time datetime="{{ post.publishedAt|date('c') }}">{{ post.publishedAt|format_date('long') }}</time>
+<span aria-hidden="true">·</span> {{ '@blog.post.reading'|trans({minutes: post.readingMinutes}) }}
+{% for taxon in post.taxa %}<a class="blog-pill is-taxon" href="{{ path('blog_index', {classe: taxon.slug}) }}">{{ taxon.label }}</a>{% endfor %}
+{% for tag in post.tags %}<a class="blog-pill" href="{{ path('blog_index', {sujet: tag.slug}) }}">{{ tag.label }}</a>{% endfor %}

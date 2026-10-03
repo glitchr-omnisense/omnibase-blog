@@ -1,0 +1,93 @@
+index:
+  title: "Chroniques"
+  eyebrow: "Au fil des jours"
+  lead: "Des idées, des tutos, des retours de classe : ce qui se passe entre les murs, raconté au fil des jours."
+  description: "Les chroniques : idées, tutoriels et retours de classe, au fil des jours."
+  topics: "Sujets"
+  all: "Tout"
+  read: "Lire"
+  empty: "Rien ici pour l'instant : la première chronique arrive."
+  pages: "Pages"
+  newer: "Plus récents"
+  older: "Plus anciens"
+  archive: "Par mois"
+  month_title: "Chroniques de {month}"
+  topic_title: "Chroniques · {topic}"
+
+post:
+  reading: "{minutes, plural, one {# min de lecture} other {# min de lecture}}"
+  by: "Par {name}"
+  neighbours: "Chroniques voisines"
+  newer: "Plus récente"
+  older: "Plus ancienne"
+
+book:
+  title: "Livre d'or"
+  eyebrow: "De passage"
+  lead: "Un mot en passant : ce que les collègues laissent en repartant de la classe."
+
+comment:
+  title: "{count, plural, =0 {Commentaires} one {# commentaire} other {# commentaires}}"
+  empty: "Personne n'a encore écrit. À vous ?"
+  closed: "Les commentaires sont fermés ici."
+  reply: "Répondre"
+  reply_signed_in: "Connectez-vous pour répondre"
+  author: "la maîtresse"
+  form:
+    title: "Laisser un mot"
+    name: "Votre prénom ou pseudo"
+    email: "E-mail (facultatif, jamais affiché)"
+    email_help: "Jamais affiché, jamais transmis."
+    website: "Votre site ou blog (facultatif)"
+    content: "Votre mot…"
+    submit: "Envoyer"
+    note: "Sans compte. Relu avant publication."
+    replying: "En réponse à"
+    cancel_reply: "annuler"
+  error:
+    reply_signed_in: "Répondre à un message demande un compte : connectez-vous, ou écrivez un nouveau mot."
+    too_fast: "Un peu vite ! Relisez votre message et renvoyez-le."
+    flood: "Vous venez d'écrire : attendez une minute avant le prochain message."
+  flash:
+    published: "Merci ! Votre message est en ligne."
+    pending: "Merci ! Votre message a bien été reçu : il sera relu avant d'apparaître."
+
+notify:
+  pending: "Un commentaire de {name} attend sous « {where} »"
+  approved: "{name} a commenté « {where} »"
+
+admin:
+  post:
+    title: "Titre"
+    published_at: "Publié le"
+    featured: "À la une"
+    comments_open: "Commentaires ouverts"
+    headline: "Sous-titre"
+    excerpt: "Aperçu"
+    excerpt_help: "Le texte de la carte sur la liste des chroniques."
+    content: "Texte"
+    tags: "Sujets"
+    taxa: "Classement (niveau, matière)"
+    cover: "Image"
+  comment:
+    state: "État"
+    name: "Nom"
+    email: "E-mail"
+    website: "Site"
+    post: "Chronique"
+    parent: "En réponse à"
+    content: "Message"
+    created_at: "Écrit le"
+    ip: "Adresse IP"
+    spam_score: "Avis d'Akismet (0 propre, 1 douteux)"
+    action:
+      approve: "Approuver"
+      spam: "Spam"
+      trash: "Corbeille"
+    flash:
+      approved: "Commentaire en ligne."
+      spam: "Commentaire classé spam, Akismet prévenu."
+      trashed: "Commentaire retiré."
+  widget:
+    pending: "{count, plural, =0 {commentaire en attente} one {commentaire en attente} other {commentaires en attente}}"
+    none: "Rien à relire."

@@ -1,0 +1,93 @@
+index:
+  title: "Chronicles"
+  eyebrow: "Day by day"
+  lead: "Ideas, tutorials, notes from the classroom: what happens between the walls, told day by day."
+  description: "The chronicles: ideas, tutorials and notes from the classroom."
+  topics: "Topics"
+  all: "All"
+  read: "Read"
+  empty: "Nothing here yet: the first chronicle is on its way."
+  pages: "Pages"
+  newer: "Newer"
+  older: "Older"
+  archive: "By month"
+  month_title: "Chronicles of {month}"
+  topic_title: "Chronicles · {topic}"
+
+post:
+  reading: "{minutes, plural, one {# min read} other {# min read}}"
+  by: "By {name}"
+  neighbours: "Neighbouring chronicles"
+  newer: "Newer"
+  older: "Older"
+
+book:
+  title: "Visitors' book"
+  eyebrow: "Passing by"
+  lead: "A word on the way out: what colleagues leave when they go."
+
+comment:
+  title: "{count, plural, =0 {Comments} one {# comment} other {# comments}}"
+  empty: "Nobody has written yet. You?"
+  closed: "Comments are closed here."
+  reply: "Reply"
+  reply_signed_in: "Sign in to reply"
+  author: "the teacher"
+  form:
+    title: "Leave a word"
+    name: "Your first name or nickname"
+    email: "E-mail (optional, never shown)"
+    email_help: "Never shown, never passed on."
+    website: "Your site or blog (optional)"
+    content: "Your word…"
+    submit: "Send"
+    note: "No account needed. Read before it appears."
+    replying: "Replying to"
+    cancel_reply: "cancel"
+  error:
+    reply_signed_in: "Replying to a message takes an account: sign in, or write a new word."
+    too_fast: "A little fast! Read your message again and send it."
+    flood: "You just wrote: wait a minute before the next one."
+  flash:
+    published: "Thank you! Your message is online."
+    pending: "Thank you! Your message was received: it will be read before it appears."
+
+notify:
+  pending: "A comment by {name} waits under “{where}”"
+  approved: "{name} commented “{where}”"
+
+admin:
+  post:
+    title: "Title"
+    published_at: "Published on"
+    featured: "Featured"
+    comments_open: "Comments open"
+    headline: "Subtitle"
+    excerpt: "Preview"
+    excerpt_help: "The card's text on the list of chronicles."
+    content: "Text"
+    tags: "Topics"
+    taxa: "Classification (level, subject)"
+    cover: "Picture"
+  comment:
+    state: "State"
+    name: "Name"
+    email: "E-mail"
+    website: "Site"
+    post: "Chronicle"
+    parent: "Replying to"
+    content: "Message"
+    created_at: "Written on"
+    ip: "IP address"
+    spam_score: "Akismet's verdict (0 clean, 1 doubtful)"
+    action:
+      approve: "Approve"
+      spam: "Spam"
+      trash: "Trash"
+    flash:
+      approved: "Comment online."
+      spam: "Comment filed as spam, Akismet told."
+      trashed: "Comment taken down."
+  widget:
+    pending: "{count, plural, =0 {comment waiting} one {comment waiting} other {comments waiting}}"
+    none: "Nothing to read."

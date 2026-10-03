@@ -1,0 +1,93 @@
+index:
+  title: "Chroniken"
+  eyebrow: "Tag für Tag"
+  lead: "Ideen, Anleitungen, Berichte aus dem Klassenzimmer: was zwischen den Wänden passiert, Tag für Tag erzählt."
+  description: "Die Chroniken: Ideen, Anleitungen und Berichte aus dem Klassenzimmer."
+  topics: "Themen"
+  all: "Alle"
+  read: "Lesen"
+  empty: "Hier ist noch nichts: die erste Chronik kommt bald."
+  pages: "Seiten"
+  newer: "Neuere"
+  older: "Ältere"
+  archive: "Nach Monat"
+  month_title: "Chroniken vom {month}"
+  topic_title: "Chroniken · {topic}"
+
+post:
+  reading: "{minutes, plural, one {# Min. Lesezeit} other {# Min. Lesezeit}}"
+  by: "Von {name}"
+  neighbours: "Benachbarte Chroniken"
+  newer: "Neuere"
+  older: "Ältere"
+
+book:
+  title: "Gästebuch"
+  eyebrow: "Auf der Durchreise"
+  lead: "Ein Wort im Vorbeigehen: was die Kolleginnen beim Verlassen der Klasse hinterlassen."
+
+comment:
+  title: "{count, plural, =0 {Kommentare} one {# Kommentar} other {# Kommentare}}"
+  empty: "Noch hat niemand geschrieben. Sie?"
+  closed: "Die Kommentare sind hier geschlossen."
+  reply: "Antworten"
+  reply_signed_in: "Zum Antworten anmelden"
+  author: "die Lehrerin"
+  form:
+    title: "Ein Wort hinterlassen"
+    name: "Ihr Vorname oder Pseudonym"
+    email: "E-Mail (optional, nie angezeigt)"
+    email_help: "Wird nie angezeigt, nie weitergegeben."
+    website: "Ihre Website oder Ihr Blog (optional)"
+    content: "Ihr Wort…"
+    submit: "Senden"
+    note: "Ohne Konto. Gelesen, bevor es erscheint."
+    replying: "Antwort an"
+    cancel_reply: "abbrechen"
+  error:
+    reply_signed_in: "Antworten erfordert ein Konto: Melden Sie sich an oder schreiben Sie einen neuen Eintrag."
+    too_fast: "Etwas schnell! Lesen Sie Ihre Nachricht noch einmal und senden Sie sie erneut."
+    flood: "Sie haben gerade geschrieben: warten Sie eine Minute bis zur nächsten Nachricht."
+  flash:
+    published: "Danke! Ihre Nachricht ist online."
+    pending: "Danke! Ihre Nachricht ist angekommen: sie wird gelesen, bevor sie erscheint."
+
+notify:
+  pending: "Ein Kommentar von {name} wartet unter „{where}“"
+  approved: "{name} hat „{where}“ kommentiert"
+
+admin:
+  post:
+    title: "Titel"
+    published_at: "Veröffentlicht am"
+    featured: "Hervorgehoben"
+    comments_open: "Kommentare offen"
+    headline: "Untertitel"
+    excerpt: "Vorschau"
+    excerpt_help: "Der Text der Karte in der Liste der Chroniken."
+    content: "Text"
+    tags: "Themen"
+    taxa: "Einordnung (Stufe, Fach)"
+    cover: "Bild"
+  comment:
+    state: "Status"
+    name: "Name"
+    email: "E-Mail"
+    website: "Website"
+    post: "Chronik"
+    parent: "Antwort an"
+    content: "Nachricht"
+    created_at: "Geschrieben am"
+    ip: "IP-Adresse"
+    spam_score: "Akismets Urteil (0 sauber, 1 zweifelhaft)"
+    action:
+      approve: "Freigeben"
+      spam: "Spam"
+      trash: "Papierkorb"
+    flash:
+      approved: "Kommentar online."
+      spam: "Kommentar als Spam abgelegt, Akismet informiert."
+      trashed: "Kommentar entfernt."
+  widget:
+    pending: "{count, plural, =0 {wartender Kommentar} one {wartender Kommentar} other {wartende Kommentare}}"
+    none: "Nichts zu lesen."
