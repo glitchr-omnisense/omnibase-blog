@@ -1,0 +1,17 @@
+[
+ {
+  "id": 9,
+  "name": "Math Education",
+  "slug": "math-education"
+ },
+ {
+  "id": 23,
+  "name": "Press articles",
+  "slug": "press-articles"
+ },
+ {
+  "id": 22,
+  "name": "Radio/TV shows",
+  "slug": "radio-shows"
+ }
+]

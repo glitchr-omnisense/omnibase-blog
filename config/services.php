@@ -24,6 +24,11 @@ return function (ContainerConfigurator $configurator) {
             $src.'/Controller/Admin/',
             $src.'/Admin/',
             $src.'/BlogBundle.php',
+            // The WordPress import's values, not services.
+            $src.'/WordPress/Item.php',
+            $src.'/WordPress/Context.php',
+            $src.'/WordPress/Result.php',
+            $src.'/WordPress/LinkRewriter.php',
         ]);
 
     $services->load('Base\\Blog\\Controller\\Client\\', $src.'/Controller/Client/')

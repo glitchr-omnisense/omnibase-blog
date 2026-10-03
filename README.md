@@ -69,3 +69,17 @@ renders the book with its form.
 The back office gets `Post` and `Comment` CRUDs (approve, mark as spam,
 restore; report a comment to Akismet as spam or ham) and a dashboard widget,
 `blog_pending_comments`, counting what waits.
+
+## Moving a WordPress site in
+
+`bin/console blog:import-wordpress https://example.org` reads a WordPress
+site's REST API: its posts become posts here, its pages go where `--map`
+sends them (the site's own targets), its pictures are copied, its links
+rewritten, and a second run (`--update`) doubles nothing - see
+[docs/wordpress-import.md](docs/wordpress-import.md).
+
+## Tests
+
+`vendor/bin/phpunit` (or `php vendor/bin/phpunit -c vendor/omnibase/blog/phpunit.xml.dist`
+inside a host): the WordPress import on a recorded excerpt of a real site's API.
+
