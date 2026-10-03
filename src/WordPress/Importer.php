@@ -29,7 +29,7 @@ class Importer
         private readonly EntityManagerInterface $entityManager,
         private readonly HttpClientInterface $http,
         #[AutowireIterator('blog.wordpress_target')] iterable $targets = [],
-        #[Autowire('@?local.uploads')] private readonly ?FilesystemOperator $uploads = null,
+        #[Autowire(service: 'local.uploads')] private readonly ?FilesystemOperator $uploads = null,
     ) {
         foreach ($targets as $target) {
             $this->targets[$target->getName()] = $target;
@@ -68,15 +68,17 @@ class Importer
             for ($parent = (int) ($entry['parent'] ?? 0), $guard = 0; $parent && isset($raw[$parent]) && $guard < 10; $parent = (int) ($raw[$parent]['parent'] ?? 0), ++$guard) {
                 array_unshift($ancestors, (string) $raw[$parent]['slug']);
             }
-            $excerpt = trim(html_entity_decode(strip_tags((string) ($entry['excerpt']['rendered'] ?? '')), \ENT_QUOTES | \ENT_HTML5));
-            $excerpt = trim((string) preg_replace(['/\s+/u', '/\s*(\[…\]|\[&hellip;\]|…\s*Continue reading.*)$/u'], [' ', '…'], $excerpt));
+            // The excerpt from the cleaned text: WordPress' own carries what plugins print (a share
+            // button's script as words), and its "[…] Continue reading".
+            $content = $this->cleaner->clean((string) ($entry['content']['rendered'] ?? ''));
+            $excerpt = trim((string) preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags((string) preg_replace('#<(br|/p|/li|/h\d)\b[^>]*>#i', ' $0', $content)), \ENT_QUOTES | \ENT_HTML5)));
             $items[] = new Item(
                 id: $id,
                 type: $entry['type'],
                 slug: (string) $entry['slug'],
                 title: trim(html_entity_decode(strip_tags((string) ($entry['title']['rendered'] ?? '')), \ENT_QUOTES | \ENT_HTML5)),
-                content: $this->cleaner->clean((string) ($entry['content']['rendered'] ?? '')),
-                excerpt: '' !== $excerpt ? mb_strimwidth($excerpt, 0, 300, '…') : null,
+                content: $content,
+                excerpt: '' !== $excerpt ? mb_strimwidth($excerpt, 0, 280, '…') : null,
                 date: new \DateTimeImmutable((string) ($entry['date'] ?? 'now')),
                 modified: isset($entry['modified']) ? new \DateTimeImmutable((string) $entry['modified']) : null,
                 status: (string) ($entry['status'] ?? 'publish'),
