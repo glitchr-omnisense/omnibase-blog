@@ -2,7 +2,7 @@
     "name": "omnibase/blog",
     "description": "Chronicles and visitors' comments for omnibase: a Post is a Thread, a Comment is read by Akismet before it goes online.",
     "type": "symfony-bundle",
-    "license": "MIT",
+    "license": "LGPL-3.0-or-later",
     "authors": [{"name": "Marco Meyer", "email": "marco.meyer@glitchr.io"}],
     "require": {
         "php": "^8.2",
