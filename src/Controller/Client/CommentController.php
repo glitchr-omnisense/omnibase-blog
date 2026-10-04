@@ -62,7 +62,7 @@ class CommentController extends AbstractController
         return $this->handle($request, null, $this->generateUrl('blog_book'));
     }
 
-    #[Route('/chroniques/{slug}/commenter', name: 'blog_post_comment', methods: ['POST'], requirements: ['slug' => '[a-z0-9\-]+'])]
+    #[Route('/%blog.path%/{slug}/commenter', name: 'blog_post_comment', methods: ['POST'], requirements: ['slug' => '[a-z0-9\-]+'])]
     public function commentPost(Request $request, string $slug): Response
     {
         $post = $this->posts->findOnePublished($slug) ?? throw $this->createNotFoundException();

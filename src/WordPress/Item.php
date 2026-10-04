@@ -16,6 +16,9 @@ final class Item
      * @param list<string> $categories their names
      * @param list<string> $tags       their names
      * @param list<string> $ancestors  the parents' slugs, the root first ("about-me" for /about-me/biography)
+     * @param string|null  $cover         the featured picture's address once copied into the uploads ("/uploads/wordpress/2014/05/a.jpg"),
+     *                                    set by the importer; null when the item has none or the media were not copied
+     * @param int          $featuredMedia the featured picture's id on the old site (featured_media), 0 for none
      */
     public function __construct(
         public readonly int $id,
@@ -35,6 +38,7 @@ final class Item
         public readonly array $tags = [],
         public ?string $cover = null,
         public readonly ?string $locale = null,
+        public readonly int $featuredMedia = 0,
     ) {
     }
 

@@ -64,6 +64,20 @@ class Post extends Thread implements LinkableInterface
     public function getCover(): ?string { return Uploader::getPublic($this, 'cover'); }
     public function getCoverFile(): ?File { return Uploader::get($this, 'cover'); }
     public function setCover($cover): self { $this->cover = $cover; return $this; }
+    /** Whether a cover is set, without asking the storage where it is. */
+    public function hasCover(): bool { return null !== $this->cover && '' !== $this->cover; }
+
+    /** The cover's address on the site ("/uploads/…"): the storage's public path without the public directory. */
+    public function getCoverUrl(): ?string
+    {
+        $path = $this->hasCover() ? $this->getCover() : null;
+        if (!\is_string($path) || '' === $path || preg_match('#^(?:https?:)?//#i', $path)) {
+            return \is_string($path) && '' !== $path ? $path : null;
+        }
+        $public = strpos($path, '/public/');
+
+        return false !== $public ? substr($path, $public + \strlen('/public')) : $path;
+    }
 
     public function isFeatured(): bool { return $this->featured; }
     public function setFeatured(bool $featured): self { $this->featured = $featured; return $this; }

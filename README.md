@@ -45,6 +45,8 @@ blog_controller:
 ```yaml
 # config/packages/blog.yaml (every key optional)
 blog:
+    path: chroniques            # the first segment of every address: /chroniques, /chroniques/{slug}, /chroniques/feed.xml
+    sitemap: true               # the published posts in /sitemap.xml
     posts_per_page: 12
     comments:
         enabled: true
@@ -57,6 +59,24 @@ blog:
 
 Then `bin/console doctrine:migrations:diff && bin/console doctrine:migrations:migrate`
 and `bin/console assets:install` (the stylesheet lives in `public/css/blog.css`).
+
+## Addresses, sitemap, JSON-LD
+
+- `blog.path` (default `chroniques`) is the first segment of the blog's
+  routes: a site of news sets `actualites`, an English one `blog`. The route
+  names do not change (`blog_index`, `blog_post`, `blog_month`, `blog_feed`,
+  `blog_post_comment`); after changing it, `bin/console cache:pool:clear --all`
+  (omnibase keeps the routes in a pool).
+- Every published post is in omnibase's `/sitemap.xml`
+  (`EventListener\SitemapListener`, on `SitemapEvent::BUILD`) with the day it
+  last changed; `blog.sitemap: false` leaves them out.
+- A post's page carries schema.org's `BlogPosting` (`Service\JsonLd::article()`:
+  headline, description, dates, author, cover, keywords, word count), in a
+  `<script type="application/ld+json">`.
+- The templates draw a cover through omnibase's `|picture` (`post.getCover()|picture(800)`:
+  in Twig `post.cover` is the stored name, not an address).
+- `Post::hasCover()` tells whether a cover is set without asking the storage;
+  `Post::getCoverUrl()` is its address on the site (`/uploads/…`).
 
 ## What the host provides
 

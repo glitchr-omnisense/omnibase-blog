@@ -27,7 +27,7 @@ and for each post and page:
 
 | Target | Of omnibase/blog | |
 |---|---|---|
-| `post` | yes | an omnibase/blog `Post` under the same slug: title, excerpt, text, published at its date (a draft stays one), its categories and tags as tags |
+| `post` | yes | an omnibase/blog `Post` under the same slug: title, excerpt, text, its featured picture as its cover, published at its date (a draft stays one), its categories and tags as tags |
 | `skip` | yes | left behind |
 | anything else | the site's | a class implementing `Base\Blog\WordPress\TargetInterface` |
 
@@ -62,6 +62,22 @@ final class BiographyTarget implements TargetInterface      // autoconfigured: t
     }
 }
 ```
+
+## The cover
+
+A post's featured picture (`featured_media`) becomes its cover: the importer
+gives every item the address of that picture's copy (`$item->cover`,
+`/uploads/wordpress/2014/05/a.jpg`; `$item->featuredMedia` is its id on the
+old site), and the `post` target uploads it as `Post::$cover` - once: a cover
+set since, by hand or by an earlier run, is kept. With `--no-media` there is
+no copy, so no cover. A site's own target reads `$item->cover` the same way.
+
+## A slug already taken
+
+omnibase keeps a thread's slug unique whatever its kind: a post named like a
+product or a page cannot have that slug. The `post` target then takes the
+slug with the post's number on the old site (`trophees-publicitaires-2170`),
+the same at every run, so the post is found again and never doubled.
 
 ## Run it again
 

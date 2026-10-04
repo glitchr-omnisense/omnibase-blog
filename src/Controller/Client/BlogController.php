@@ -5,16 +5,19 @@ namespace Base\Blog\Controller\Client;
 use Base\Attributes\Attribute\Sitemap;
 use Base\Repository\Thread\CommentRepository;
 use Base\Blog\Repository\PostRepository;
+use Base\Blog\Service\JsonLd;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
  * The chronicles: the posts a page at a time, by topic (a tag) or by what
  * the site classifies them with (a taxon: a level, a subject), by month,
- * one post with its comments, and the RSS feed.
+ * one post with its comments, and the RSS feed. The first segment is
+ * blog.path ("chroniques" by default).
  */
 class BlogController extends AbstractController
 {
@@ -22,11 +25,12 @@ class BlogController extends AbstractController
         private readonly PostRepository $posts,
         private readonly CommentRepository $comments,
         #[Autowire('%blog.posts_per_page%')] private readonly int $perPage = 12,
+        private readonly ?JsonLd $jsonLd = null,
     ) {
     }
 
     #[Sitemap(priority: 0.8, changefreq: 'daily')]
-    #[Route('/chroniques', name: 'blog_index')]
+    #[Route('/%blog.path%', name: 'blog_index')]
     public function index(Request $request): Response
     {
         $page = max(1, $request->query->getInt('page', 1));
@@ -47,7 +51,7 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/chroniques/{year}/{month}', name: 'blog_month', requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'])]
+    #[Route('/%blog.path%/{year}/{month}', name: 'blog_month', requirements: ['year' => '\d{4}', 'month' => '\d{1,2}'])]
     public function month(int $year, int $month): Response
     {
         return $this->render('@Blog/client/index.html.twig', [
@@ -63,7 +67,7 @@ class BlogController extends AbstractController
         ]);
     }
 
-    #[Route('/chroniques/feed.xml', name: 'blog_feed', format: 'xml')]
+    #[Route('/%blog.path%/feed.xml', name: 'blog_feed', format: 'xml')]
     public function feed(): Response
     {
         $response = $this->render('@Blog/client/feed.xml.twig', [
@@ -74,8 +78,10 @@ class BlogController extends AbstractController
         return $response;
     }
 
-    #[Route('/chroniques/{slug}', name: 'blog_post', requirements: ['slug' => '[a-z0-9\-]+'])]
-    public function post(string $slug): Response
+    // Listed in /sitemap.xml by EventListener\SitemapListener, one entry a post: the attribute gives their priority.
+    #[Sitemap(priority: 0.6, changefreq: 'monthly')]
+    #[Route('/%blog.path%/{slug}', name: 'blog_post', requirements: ['slug' => '[a-z0-9\-]+'])]
+    public function post(Request $request, string $slug): Response
     {
         $post = $this->posts->findOnePublished($slug)
             ?? throw $this->createNotFoundException(sprintf('No published post "%s".', $slug));
@@ -86,6 +92,11 @@ class BlogController extends AbstractController
             'older' => $older,
             'newer' => $newer,
             'comments' => $this->comments->findVisible($post),
+            'jsonld' => $this->jsonLd?->article(
+                $post,
+                $this->generateUrl('blog_post', ['slug' => $post->getSlug()], UrlGeneratorInterface::ABSOLUTE_URL),
+                $request->getSchemeAndHttpHost().$request->getBasePath(),
+            ),
         ]);
     }
 }

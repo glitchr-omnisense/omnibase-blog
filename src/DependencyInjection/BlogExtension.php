@@ -23,7 +23,7 @@ class BlogExtension extends AbstractBaseExtension
         $configuration = new BlogConfiguration();
         $config = (new Processor())->processConfiguration($configuration, $configs);
 
-        // Flat parameters: blog.posts_per_page, blog.comments.auto_approve...
+        // Flat parameters: blog.path, blog.sitemap, blog.posts_per_page, blog.comments.auto_approve...
         $this->setConfiguration($container, $config, $configuration->getTreeBuilder()->buildTree()->getName());
     }
 }

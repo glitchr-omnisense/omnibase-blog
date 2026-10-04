@@ -12,7 +12,8 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
  * A WordPress site moved in: its posts and pages read from its REST API,
  * each sent to a target (a blog post by default, anything a site declares
  * through the map), their HTML cleaned of what plugins add, their pictures
- * copied into the uploads, their links rewritten - to the pictures copied,
+ * copied into the uploads (the featured one given to the target as the
+ * item's cover), their links rewritten - to the pictures copied,
  * to the posts and pages imported (by permalink, ?p=, ?page_id=). Run it
  * again with --update: what was imported is found again and brought up to
  * date, never doubled.
@@ -88,6 +89,7 @@ class Importer
                 menuOrder: (int) ($entry['menu_order'] ?? 0),
                 categories: array_values(array_filter(array_map(fn ($c) => $names['categories'][(int) $c] ?? null, $entry['categories'] ?? []))),
                 tags: array_values(array_filter(array_map(fn ($t) => $names['tags'][(int) $t] ?? null, $entry['tags'] ?? []))),
+                featuredMedia: (int) ($entry['featured_media'] ?? 0),
             );
         }
         usort($items, static fn (Item $a, Item $b) => [$a->type, \count($a->ancestors), $a->menuOrder, $a->id] <=> [$b->type, \count($b->ancestors), $b->menuOrder, $b->id]);
@@ -131,11 +133,14 @@ class Importer
                 }
             }
         }
-        $pictures = $media ? $this->copyMedia($site, $folder, $result) : [];
+        $covers = [];
+        $pictures = $media ? $this->copyMedia($site, $folder, $result, $covers) : [];
         $links = new LinkRewriter($site, $pictures, $byId, $byPath);
 
         $context = new Context($site, $update, $author, $options, $result);
         foreach ($items as $item) {
+            // Its featured picture, where its copy is: a target makes it the cover.
+            $item->cover = $covers[$item->featuredMedia] ?? null;
             $item->content = $links->rewrite($item->content);
             $result->add($routes[$item->id]->getName(), $routes[$item->id]->import($item, $context));
         }
@@ -148,9 +153,11 @@ class Importer
      * The site's media copied into the uploads (uploads/<folder>/2014/05/book-a.jpg):
      * what is already there is left.
      *
+     * @param array<int, string> $byId filled with each medium's id on the old site => its new address
+     *
      * @return array<string, string> an upload's key (LinkRewriter::mediaKey()) => its new address
      */
-    private function copyMedia(string $site, string $folder, Result $result): array
+    private function copyMedia(string $site, string $folder, Result $result, array &$byId = []): array
     {
         if (!$this->uploads) {
             return [];
@@ -171,6 +178,9 @@ class Importer
                     ++$result->media;
                 }
                 $map[$key] = '/uploads/'.$target;
+                if (isset($medium['id'])) {
+                    $byId[(int) $medium['id']] = $map[$key];
+                }
             } catch (\Throwable $e) {
                 $result->warnings[] = sprintf('%s: %s', $source, $e->getMessage());
             }

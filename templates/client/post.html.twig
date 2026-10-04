@@ -15,7 +15,7 @@
         {% if post.headline %}<p class="blog-lead">{{ post.headline }}</p>{% endif %}
         {% if post.owners|length %}<p class="blog-byline">{{ '@blog.post.by'|trans({name: post.owners|first}) }}</p>{% endif %}
     </header>
-    {% if post.cover %}<figure class="blog-post-cover"><img src="{{ post.cover }}" alt=""></figure>{% endif %}
+    {% if post.hasCover() %}<figure class="blog-post-cover"><img src="{{ post.getCover()|picture(1600) }}" alt=""></figure>{% endif %}
     <div class="blog-prose">{{ post.content|wysiwyg|raw }}</div>
 
     <nav class="blog-neighbours" aria-label="{{ '@blog.post.neighbours'|trans }}">
@@ -24,5 +24,7 @@
     </nav>
 
     {% include '@Blog/client/_comments.html.twig' with {post: post, comments: comments, comment_form: comment_form|default(null)} %}
+
+    {% if jsonld|default(null) %}<script type="application/ld+json">{{ jsonld|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}</script>{% endif %}
 </article>
 {% endblock %}

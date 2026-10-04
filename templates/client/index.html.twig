@@ -30,7 +30,7 @@
 
     {% if headline %}
     <article class="blog-card is-headline">
-        {% if headline.cover %}<a class="blog-card-cover" href="{{ path('blog_post', {slug: headline.slug}) }}"><img src="{{ headline.cover }}" alt="" loading="lazy"></a>{% endif %}
+        {% if headline.hasCover() %}<a class="blog-card-cover" href="{{ path('blog_post', {slug: headline.slug}) }}"><img src="{{ headline.getCover()|picture(1200) }}" alt="" loading="lazy"></a>{% endif %}
         <div class="blog-card-body">
             <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' with {post: headline} %}</p>
             <h2><a href="{{ path('blog_post', {slug: headline.slug}) }}">{{ headline.title }}</a></h2>

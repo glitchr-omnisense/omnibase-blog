@@ -83,6 +83,9 @@ final class ImporterTest extends TestCase
         $post = $posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths'];
         $this->assertSame(['Radio/TV shows'], $post->categories);
         $this->assertSame('2018-02-15', $post->date->format('Y-m-d'));
+        $this->assertSame(235, $post->featuredMedia);
+        $this->assertSame('/uploads/wordpress/2014/05/book-a.jpg', $post->cover, 'the featured picture, where its copy is');
+        $this->assertNull($posts->items['review-of-monicas-unpacking-fractions-book']->cover, 'no featured picture, no cover');
 
         $second = $importer->import('https://monicaneagoy.info', $map, update: true);
         $this->assertSame(0, $second->count(Result::CREATED));
@@ -93,6 +96,18 @@ final class ImporterTest extends TestCase
 
         $third = $importer->import('https://monicaneagoy.info', $map);
         $this->assertSame(4, $third->count(Result::KEPT), 'without --update, left alone');
+    }
+
+    public function testWithoutTheMediaAnItemHasNoCover(): void
+    {
+        $site = new WordPressSite();
+        $posts = new MemoryTarget('post');
+        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [$posts, new SkipTarget()]);
+
+        $importer->import('https://monicaneagoy.info', ['*page' => 'skip'], media: false);
+
+        $this->assertSame(235, $posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths']->featuredMedia);
+        $this->assertNull($posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths']->cover);
     }
 
     public function testAnUnknownTargetIsRefused(): void

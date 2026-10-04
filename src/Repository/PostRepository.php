@@ -41,6 +41,14 @@ class PostRepository extends ServiceEntityRepository
             ->getQuery()->getSingleScalarResult();
     }
 
+    /** @return list<Post> every published post, newest first: for a sitemap */
+    public function findAllPublished(): array
+    {
+        return $this->published()
+            ->orderBy('p.publishedAt', 'DESC')->addOrderBy('p.id', 'DESC')
+            ->getQuery()->getResult();
+    }
+
     /** @return list<Post> */
     public function findLatest(int $limit = 3): array
     {
