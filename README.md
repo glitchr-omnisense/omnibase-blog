@@ -90,6 +90,16 @@ The back office gets `Post` and `Comment` CRUDs (approve, mark as spam,
 restore; report a comment to Akismet as spam or ham) and a dashboard widget,
 `blog_pending_comments`, counting what waits.
 
+The two CRUDs are written by the site's administrator (`ROLE_ADMIN`: a
+teacher, an editor), not by the super-admin only: they carry omnibase/admin's
+`#[OpenToAdmins]` - creating, editing and deleting a post; deleting a comment
+and its `approve`, `spam` and `trash`. On an omnibase/admin that does not
+have the attribute yet (before 7474f85) the bundle declares a stand-in of
+that name (`compat/OpenToAdmins.php`: omnibase instantiates every attribute
+of a controller, and a class that does not exist stopped the site) and its
+own `OpenToAdminsTrait` opens the screens as it did; both go when no
+application mounts the bundle on such an admin any more.
+
 ## Moving a WordPress site in
 
 `bin/console blog:import-wordpress https://example.org` reads a WordPress
@@ -101,5 +111,7 @@ rewritten, and a second run (`--update`) doubles nothing - see
 ## Tests
 
 `vendor/bin/phpunit` (or `php vendor/bin/phpunit -c vendor/omnibase/blog/phpunit.xml.dist`
-inside a host): the WordPress import on a recorded excerpt of a real site's API.
+inside a host): the WordPress import on a recorded excerpt of a real site's API;
+inside a host only, who writes in the back office
+(`tests/Controller/Admin/OpenToAdminsTest`).
 

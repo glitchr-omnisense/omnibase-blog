@@ -3,6 +3,7 @@
 namespace Base\Blog\Controller\Admin\Crud;
 
 use Base\Blog\Controller\Admin\OpenToAdminsTrait;
+use Base\Admin\Attribute\OpenToAdmins;
 use Base\Admin\Config\Actions;
 use Base\Admin\Controller\AbstractCrudController;
 use Base\Admin\Filter\Filters;
@@ -23,9 +24,10 @@ use Base\Field\TextField;
  * list, the text (EditorJS, autosaved), its subjects (tags), its cover.
  * Published, it is on /chroniques at its date (a date to come schedules it).
  */
+#[OpenToAdmins]
 class PostCrudController extends AbstractCrudController
 {
-    use OpenToAdminsTrait;
+    use OpenToAdminsTrait; // for an omnibase/admin without #[OpenToAdmins]
 
     public static function getEntityFqcn(): string
     {
@@ -44,6 +46,7 @@ class PostCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
+        // #[OpenToAdmins] opens the screen; the trait does on an omnibase/admin that does not have it.
         return $this->openToAdmins(parent::configureActions($actions));
     }
 

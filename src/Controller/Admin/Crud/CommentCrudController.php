@@ -4,6 +4,7 @@ namespace Base\Blog\Controller\Admin\Crud;
 
 use Base\Blog\Controller\Admin\OpenToAdminsTrait;
 use Base\Admin\Attribute\AdminAction;
+use Base\Admin\Attribute\OpenToAdmins;
 use Base\Admin\Config\Action;
 use Base\Admin\Config\Actions;
 use Base\Admin\Controller\AbstractCrudController;
@@ -26,9 +27,10 @@ use Symfony\Contracts\Service\Attribute\Required;
  * Three buttons on each - approve, spam, trash - and two that teach Akismet
  * (a spam it let through, a comment it held wrongly).
  */
+#[OpenToAdmins(actions: ['approve', 'spam', 'trash'])]
 class CommentCrudController extends AbstractCrudController
 {
-    use OpenToAdminsTrait;
+    use OpenToAdminsTrait; // for an omnibase/admin without #[OpenToAdmins]
 
     private AkismetReporter $akismet;
 
@@ -71,6 +73,7 @@ class CommentCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         // Comments come from the visitors: moderated here, never written here.
+        // (#[OpenToAdmins] opens the screen; the trait does on an omnibase/admin that does not have it.)
         $actions = $this->openToAdmins(parent::configureActions($actions), 'approve', 'spam', 'trash')->disable(Action::NEW);
         foreach ([Actions::PAGE_INDEX, Actions::PAGE_DETAIL] as $page) {
             $actions
