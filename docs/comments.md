@@ -15,6 +15,14 @@ repository or guard of its own - it uses the core's:
 | `Base\Blog\Service\CommentGuard` | `Base\Service\CommentGuard` (the blog passes its `min_delay` and `flood_interval`) |
 | `Post::getComments()`, `getVisibleComments()` | `blog_comments(post)`, `blog_comments_count(post)` in Twig, or the repository |
 
+The guard is the core's: `CommentType`'s own trap (`url`) and time (`opened`),
+read by `Base\Service\CommentGuard` with the blog's `min_delay` and
+`flood_interval`, and the forms' guard of glitchr/omnibase on top - its stamp,
+the lists, the captcha when the site has glitchr/omniguard (printed above the
+button). A comment form built by hand in a test posts the guard's signed stamp
+(`FormGuard::stamp()`) and, with omniguard's `fixed` test gateway,
+`omniguard-token=omniguard-fixed-token`.
+
 What stays the blog's: the routes (`blog_book`, `blog_book_comment`,
 `blog_post_comment`), the configuration (`blog.comments.*`), the moderation
 screen (`CommentCrudController`, `/admin/comments`, filter `thread`), the
