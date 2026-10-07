@@ -3,46 +3,51 @@
 namespace Base\Blog\Service;
 
 use Base\Entity\Thread\Comment;
-use Base\Service\SettingBagInterface;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Base\Service\SpamChecker;
+use Omniguard\Exception\OmniguardException;
+use Omniguard\Model\Submission;
+use Psr\Log\LoggerInterface;
 
 /**
- * Teaching Akismet: a comment it let through that was spam (submit-spam),
- * one it held that was not (submit-ham). The key is omnibase's
- * (api.spam.akismet, from base.spam.akismet); without it nothing is sent.
+ * Teaching the classifier: a comment it let through that was spam
+ * (submit-spam), one it held that was not (submit-ham). The classifier is
+ * the one glitchr/omnibase's SpamChecker asks - Akismet with the site's key
+ * (api.spam.akismet, from base.spam.akismet), or base.guard.classifier -
+ * told the comment as it was classified: its text, its author, the address
+ * and the browser it came from, the site's home page. Without a classifier
+ * nothing is sent; a provider's error is logged, not thrown at the
+ * moderator.
  */
 final class AkismetReporter
 {
     public function __construct(
-        private readonly HttpClientInterface $client,
-        private readonly SettingBagInterface $settings,
-        private readonly RequestStack $requests,
+        private readonly SpamChecker $spam,
+        private readonly ?LoggerInterface $logger = null,
     ) {
     }
 
-    public function reportSpam(Comment $comment): bool { return $this->submit('submit-spam', $comment); }
-    public function reportHam(Comment $comment): bool { return $this->submit('submit-ham', $comment); }
+    public function reportSpam(Comment $comment): bool { return $this->report($comment, true); }
+    public function reportHam(Comment $comment): bool { return $this->report($comment, false); }
 
-    private function submit(string $call, Comment $comment): bool
+    private function report(Comment $comment, bool $spam): bool
     {
-        $key = $this->settings->getScalar('api.spam.akismet');
-        if (!$key) {
+        if (!class_exists(Submission::class)) {
+            return false; // glitchr/omniguard is not installed: no classifier
+        }
+
+        try {
+            // What the visitor sent, not the moderator's request.
+            return $this->spam->report($this->spam->submission($comment, array_filter([
+                'user_ip' => $comment->getIp(),
+                'user_agent' => $comment->getUserAgent(),
+                'comment_author_url' => $comment->getWebsite(),
+                'permalink' => '',
+                'referrer' => '',
+            ], static fn ($value) => null !== $value)), $spam);
+        } catch (OmniguardException $e) {
+            $this->logger?->warning('The classifier could not be told about comment {id}: {message}', ['id' => $comment->getId(), 'message' => $e->getMessage()]);
+
             return false;
         }
-        $request = $this->requests->getCurrentRequest();
-        $this->client->request('POST', sprintf('https://%s.rest.akismet.com/1.1/%s', $key, $call), ['body' => array_filter([
-            'blog' => $request?->getSchemeAndHttpHost(),
-            'user_ip' => $comment->getIp(),
-            'user_agent' => $comment->getUserAgent(),
-            'comment_type' => 'comment',
-            'comment_author' => $comment->getName(),
-            'comment_author_email' => $comment->getEmail(),
-            'comment_author_url' => $comment->getWebsite(),
-            'comment_content' => $comment->getContent(),
-            'comment_date_gmt' => $comment->getCreatedAt()?->format(\DateTimeInterface::ATOM),
-        ])]);
-
-        return true;
     }
 }
