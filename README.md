@@ -93,12 +93,8 @@ restore; report a comment to Akismet as spam or ham) and a dashboard widget,
 The two CRUDs are written by the site's administrator (`ROLE_ADMIN`: a
 teacher, an editor), not by the super-admin only: they carry omnibase/admin's
 `#[OpenToAdmins]` - creating, editing and deleting a post; deleting a comment
-and its `approve`, `spam` and `trash`. On an omnibase/admin that does not
-have the attribute yet (before 7474f85) the bundle declares a stand-in of
-that name (`compat/OpenToAdmins.php`: omnibase instantiates every attribute
-of a controller, and a class that does not exist stopped the site) and its
-own `OpenToAdminsTrait` opens the screens as it did; both go when no
-application mounts the bundle on such an admin any more.
+and its `approve`, `spam` and `trash`. The attribute is
+omnibase/admin's from 7474f85.
 
 ## Moving a WordPress site in
 

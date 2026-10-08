@@ -22,9 +22,7 @@ use Symfony\Component\Security\Core\User\InMemoryUser;
  * teacher, an editor), not by the super-admin only: a post is created,
  * changed and removed, a comment is approved, marked as spam, put in the
  * bin (it is never written here: it comes from the visitors). Someone who
- * is not an administrator does none of it. True with #[OpenToAdmins] and,
- * on an omnibase/admin that does not have the attribute yet, with the
- * bundle's OpenToAdminsTrait.
+ * is not an administrator does none of it (#[OpenToAdmins]).
  */
 final class OpenToAdminsTest extends KernelTestCase
 {

@@ -2,7 +2,6 @@
 
 namespace Base\Blog\Controller\Admin\Crud;
 
-use Base\Blog\Controller\Admin\OpenToAdminsTrait;
 use Base\Admin\Attribute\AdminAction;
 use Base\Admin\Attribute\OpenToAdmins;
 use Base\Admin\Config\Action;
@@ -30,7 +29,6 @@ use Symfony\Contracts\Service\Attribute\Required;
 #[OpenToAdmins(actions: ['approve', 'spam', 'trash'])]
 class CommentCrudController extends AbstractCrudController
 {
-    use OpenToAdminsTrait; // for an omnibase/admin without #[OpenToAdmins]
 
     private AkismetReporter $akismet;
 
@@ -73,8 +71,8 @@ class CommentCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         // Comments come from the visitors: moderated here, never written here.
-        // (#[OpenToAdmins] opens the screen; the trait does on an omnibase/admin that does not have it.)
-        $actions = $this->openToAdmins(parent::configureActions($actions), 'approve', 'spam', 'trash')->disable(Action::NEW);
+        // (#[OpenToAdmins] opens the screen and its approve, spam and trash.)
+        $actions = parent::configureActions($actions)->disable(Action::NEW);
         foreach ([Actions::PAGE_INDEX, Actions::PAGE_DETAIL] as $page) {
             $actions
                 ->add($page, Action::new('approve', '@blog.admin.comment.action.approve', 'fa-solid fa-check')->linkToCrudAction('approve'))

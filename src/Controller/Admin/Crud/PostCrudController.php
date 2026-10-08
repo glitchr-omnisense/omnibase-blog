@@ -2,9 +2,7 @@
 
 namespace Base\Blog\Controller\Admin\Crud;
 
-use Base\Blog\Controller\Admin\OpenToAdminsTrait;
 use Base\Admin\Attribute\OpenToAdmins;
-use Base\Admin\Config\Actions;
 use Base\Admin\Controller\AbstractCrudController;
 use Base\Admin\Filter\Filters;
 use Base\Blog\Entity\Post;
@@ -27,7 +25,6 @@ use Base\Field\TextField;
 #[OpenToAdmins]
 class PostCrudController extends AbstractCrudController
 {
-    use OpenToAdminsTrait; // for an omnibase/admin without #[OpenToAdmins]
 
     public static function getEntityFqcn(): string
     {
@@ -42,12 +39,6 @@ class PostCrudController extends AbstractCrudController
     public function configureFilters(Filters $filters): Filters
     {
         return $filters->add('state')->add('featured')->add('tags');
-    }
-
-    public function configureActions(Actions $actions): Actions
-    {
-        // #[OpenToAdmins] opens the screen; the trait does on an omnibase/admin that does not have it.
-        return $this->openToAdmins(parent::configureActions($actions));
     }
 
     public function configureFields(string $pageName): iterable
