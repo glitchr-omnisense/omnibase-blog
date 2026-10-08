@@ -111,3 +111,6 @@ inside a host): the WordPress import on a recorded excerpt of a real site's API;
 inside a host only, who writes in the back office
 (`tests/Controller/Admin/OpenToAdminsTest`).
 
+## License
+
+MIT since 2026-10-09; earlier versions remain published under LGPL-3.0-or-later.
