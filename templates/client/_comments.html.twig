@@ -42,7 +42,7 @@
             {{ form_errors(form) }}
             <p class="blog-replying" data-blog-replying hidden>{{ '@blog.comment.form.replying'|trans }} <b data-blog-replying-name></b> · <button type="button" data-blog-cancel-reply>{{ '@blog.comment.form.cancel_reply'|trans }}</button></p>
             {{ form_widget(form.content) }}{{ form_errors(form.content) }}
-            {#- The forms' guard (glitchr/omnibase): its captcha, when the site has glitchr/omniguard, before
+            {#- The forms' guard (glitchr/omnibase): its captcha, when the site has glitchr/omnishield, before
                 the button - form_end left it under the note. -#}
             {% if form.guard_captcha is defined %}{{ form_row(form.guard_captcha) }}{% endif %}
             <div class="blog-form-line">

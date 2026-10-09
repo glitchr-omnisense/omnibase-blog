@@ -10,9 +10,9 @@ use Base\Service\ParameterBagInterface;
 use Base\Service\SettingBagInterface;
 use Base\Service\SpamChecker;
 use Base\Service\TranslatorInterface;
-use Omniguard\Registry;
-use Omniguard\Testing\FixedGateway;
-use Omniguard\Testing\FixedGatewayFactory;
+use Omnishield\Registry;
+use Omnishield\Testing\FixedGateway;
+use Omnishield\Testing\FixedGatewayFactory;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -28,7 +28,7 @@ final class AkismetReporterTest extends TestCase
     protected function setUp(): void
     {
         if (!class_exists(Registry::class) || !method_exists(SpamChecker::class, 'report')) {
-            self::markTestSkipped('glitchr/omniguard, and glitchr/omnibase with SpamChecker::report().');
+            self::markTestSkipped('glitchr/omnishield, and glitchr/omnibase with SpamChecker::report().');
         }
     }
 

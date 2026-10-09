@@ -15,9 +15,9 @@ use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
  * The comment form the blog builds (CommentController::form(), the visitors' book's) is guarded twice
  * over, as glitchr/omnibase guards a comment: CommentType's own trap (url) and time (opened), read by
  * Base\Service\CommentGuard with the blog's min_delay, and the forms' guard - its signed stamp, the
- * lists, the captcha when the host has glitchr/omniguard. A comment written as a person writes it goes
+ * lists, the captcha when the host has glitchr/omnishield. A comment written as a person writes it goes
  * through; a filled trap, a comment sent faster than the blog's delay and a missing captcha token are
- * refused. Run by a host application's PHPUnit (its test captcha: omniguard's "fixed" gateway).
+ * refused. Run by a host application's PHPUnit (its test captcha: omnishield's "fixed" gateway).
  */
 final class CommentGuardTest extends KernelTestCase
 {
@@ -52,7 +52,7 @@ final class CommentGuardTest extends KernelTestCase
             'guard_opened' => static::getContainer()->get(FormGuard::class)->stamp(time() - 10),
         ];
         if ($form->has('guard_captcha')) {
-            $data['guard_captcha'] = 'omniguard-fixed-token';
+            $data['guard_captcha'] = (class_exists(\Omnishield\Testing\FixedGateway::class) ? \Omnishield\Testing\FixedGateway::TOKEN : 'omniguard-fixed-token'); // omnishield's "fixed" test gateway, or omniguard's on a host not moved to omnishield yet.
         }
         $data = array_intersect_key(array_filter($overrides + $data, static fn ($value) => null !== $value), iterator_to_array($form));
         // The form's CSRF token, as its page prints it (not a child of the form).
@@ -93,7 +93,7 @@ final class CommentGuardTest extends KernelTestCase
     {
         $form = static::getContainer()->get(CommentController::class)->form(null);
         if (!$form->has('guard_captcha')) {
-            self::markTestSkipped('The host application has no captcha (glitchr/omniguard).');
+            self::markTestSkipped('The host application has no captcha (glitchr/omnishield).');
         }
         $form = $this->send(['guard_captcha' => '']);
         self::assertGreaterThan(0, $form->get('guard_captcha')->getErrors()->count(), 'refused on the captcha');
