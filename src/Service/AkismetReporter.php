@@ -31,8 +31,8 @@ final class AkismetReporter
 
     private function report(Comment $comment, bool $spam): bool
     {
-        if (!class_exists(Submission::class) && !class_exists('Omniguard\\Model\\Submission')) {
-            return false; // glitchr/omnishield (formerly omniguard) is not installed: no classifier
+        if (!class_exists(Submission::class)) {
+            return false; // glitchr/omnishield is not installed: no classifier
         }
 
         try {
@@ -44,7 +44,7 @@ final class AkismetReporter
                 'permalink' => '',
                 'referrer' => '',
             ], static fn ($value) => null !== $value)), $spam);
-        } catch (OmnishieldException|\Omniguard\Exception\OmniguardException $e) { // omniguard: a site not moved to omnishield yet
+        } catch (OmnishieldException $e) {
             $this->logger?->warning('The classifier could not be told about comment {id}: {message}', ['id' => $comment->getId(), 'message' => $e->getMessage()]);
 
             return false;
