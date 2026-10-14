@@ -58,8 +58,8 @@ class CommentCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield SelectField::new('state', '@blog.admin.comment.state')->setColumns(3);
         yield TextField::new('name', '@blog.admin.comment.name')->setColumns(3);
-        yield TextField::new('email', '@blog.admin.comment.email')->setColumns(3)->hideOnIndex();
-        yield TextField::new('website', '@blog.admin.comment.website')->setColumns(3)->hideOnIndex();
+        yield TextField::new('email', '@blog.admin.comment.email')->setRequired(false)->setColumns(3)->hideOnIndex();
+        yield TextField::new('website', '@blog.admin.comment.website')->setRequired(false)->setColumns(3)->hideOnIndex();
         yield AssociationField::new('thread', '@blog.admin.comment.post')->setColumns(6)->setRequired(false);
         yield AssociationField::new('parent', '@blog.admin.comment.parent')->setColumns(6)->setRequired(false)->hideOnIndex();
         yield TextareaField::new('content', '@blog.admin.comment.content');

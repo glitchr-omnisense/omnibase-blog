@@ -46,16 +46,16 @@ class PostCrudController extends AbstractCrudController
         yield IdField::new('id')->onlyOnIndex();
         yield TextField::new('title', '@blog.admin.post.title')->setColumns(8);
         yield StateField::new('state')->setColumns(4);
-        yield SlugField::new('slug')->setColumns(4)->hideOnIndex();
-        yield DateTimeField::new('publishedAt', '@blog.admin.post.published_at')->setColumns(4);
+        yield SlugField::new('slug')->setTargetFieldName('title')->setColumns(4)->hideOnIndex();
+        yield DateTimeField::new('publishedAt', '@blog.admin.post.published_at')->setRequired(false)->setColumns(4);
         yield BooleanField::new('featured', '@blog.admin.post.featured')->setColumns(2);
         yield BooleanField::new('commentsOpen', '@blog.admin.post.comments_open')->setColumns(2);
-        yield TextField::new('headline', '@blog.admin.post.headline')->setColumns(12)->hideOnIndex();
-        yield TextareaField::new('excerpt', '@blog.admin.post.excerpt')->hideOnIndex()->setHelp('@blog.admin.post.excerpt_help');
+        yield TextField::new('headline', '@blog.admin.post.headline')->setRequired(false)->setColumns(12)->hideOnIndex();
+        yield TextareaField::new('excerpt', '@blog.admin.post.excerpt')->setRequired(false)->hideOnIndex()->setHelp('@blog.admin.post.excerpt_help');
         yield EditorField::new('content', '@blog.admin.post.content')->hideOnIndex()->setFormTypeOption('collab_autosave', true)->setFormTypeOption('collab_live', true);
         yield SelectField::new('tags', '@blog.admin.post.tags')->allowMultipleChoices()->setRequired(false)->setColumns(6)->hideOnIndex();
         yield SelectField::new('taxa', '@blog.admin.post.taxa')->allowMultipleChoices()->setRequired(false)->setColumns(6)->hideOnIndex();
-        yield ImageField::new('cover', '@blog.admin.post.cover')->setColumns(6)->hideOnIndex();
+        yield ImageField::new('cover', '@blog.admin.post.cover')->setRequired(false)->setColumns(6)->hideOnIndex();
     }
 
     public function createEntity(string $entityFqcn): object
