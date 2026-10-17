@@ -1,6 +1,6 @@
 # Comments
 
-The blog's comments are glitchr/omnibase's `Base\Entity\Thread\Comment` (table
+The blog's comments are omniscient/omnibase's `Base\Entity\Thread\Comment` (table
 `threadComment`): a post is a thread, so a comment under a post has the post as
 its `thread`; a comment with no thread belongs to the visitors' book
 (`/livre-d-or`). The bundle no longer has a Comment entity, enum, form,
@@ -17,7 +17,7 @@ repository or guard of its own - it uses the core's:
 
 The guard is the core's: `CommentType`'s own trap (`url`) and time (`opened`),
 read by `Base\Service\CommentGuard` with the blog's `min_delay` and
-`flood_interval`, and the forms' guard of glitchr/omnibase on top - its stamp,
+`flood_interval`, and the forms' guard of omniscient/omnibase on top - its stamp,
 the lists, the captcha when the site has glitchr/omnishield (printed above the
 button). A comment form built by hand in a test posts the guard's signed stamp
 (`FormGuard::stamp()`) and, with omnishield's `fixed` test gateway,
