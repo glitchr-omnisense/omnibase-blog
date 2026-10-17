@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Une page écrite en HTML — omniscient/omnibase</title>
+    <style>body:before {
+    display: none;
+    visibility: hidden;
+}</style><style>
+        body { margin: 0; background: #eef2f5; font: 14px/1.5 system-ui, sans-serif; color: #284555; }
+        .demo-bar { background: #006699; color: #fff; padding: .5rem 1rem; font-size: 13px; }
+        .demo-bar a { color: #fff; }
+        .demo-cols { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 1.5rem; max-width: 1100px; margin: 1.5rem auto; padding: 0 1rem; }
+        @media (max-width: 860px) { .demo-cols { grid-template-columns: 1fr; } }
+    </style>
+    
+        <link rel="stylesheet" href="/bundles/base/base-async.25c495ee.css" >
+
+        <link rel="stylesheet" href="/bundles/base/base-defer.41e967b6.css" >
+
+    
+        <link rel="stylesheet" href="/bundles/base/form-defer.beb808be.css" >
+
+        <link rel="stylesheet" href="/bundles/base/form-defer.editor.f43c0d96.css" >
+
+    <link rel="stylesheet" href="/bundles/blog/css/blog.css"></head>
+<body>
+    <div class="demo-bar">
+        omniscient/omnibase demo — signed in as <b>nobody</b> ·
+        <a href="/">tour</a> ·
+        <a href="/boutiques">shop</a> · <a href="/bbs">forum</a> · <a href="/messagerie">mailbox</a> ·
+        <a href="/support">support</a> · <a href="/compte/licences">licences</a> · <a href="/git">git</a> · <a href="/admin">admin</a>
+    </div>
+    <div class="demo-cols">
+        <main><article class="blog blog-post">
+    <header class="blog-post-head">
+        <p class="blog-card-meta"><time datetime="2026-04-08T09:30:00+00:00">8 April 2026</time>
+<span aria-hidden="true">·</span> 1 min read
+</p>
+        <h1>Une page écrite en HTML</h1>
+                <p class="blog-byline">By camille.autrice</p>    </header>
+        <div class="blog-prose">
+
+<div class="ql-editor wysiwyg"><h2>Un titre en HTML</h2><p>Un paragraphe écrit avec <em>Quill</em>, accentué : é, à, ç.</p></div>
+<div class="clear-both"></div>
+</div>
+
+    <nav class="blog-neighbours" aria-label="Neighbouring chronicles">
+        <span></span>        <a rel="next" href="/chroniques/chronique-12"><small>Older</small><span>Chronique numéro 12</span></a>    </nav>
+
+    <section class="blog-comments" id="commentaires">
+        <h2>Comments</h2>
+    
+    
+        <p class="blog-comments-empty">Nobody has written yet. You?</p>
+    
+        <div class="blog-comment-form" id="commenter">
+        <form name="comment" method="post" action="/chroniques/chronique-en-html/commenter" class="blog-form" novalidate="novalidate">
+            
+            <p class="blog-replying" data-blog-replying hidden>Replying to <b data-blog-replying-name></b> · <button type="button" data-blog-cancel-reply>cancel</button></p>
+            <textarea id="comment_content" name="comment[content]" required="required" placeholder="Your word…" rows="3" maxlength="4000" class="form-control"></textarea>            <div class="blog-form-line">
+                <input type="text" id="comment_name" name="comment[name]" required="required" placeholder="Your first name or nickname" autocomplete="name" maxlength="120" class="form-control" /><input type="email" id="comment_email" name="comment[email]" placeholder="E-mail (optional, never shown)" autocomplete="email" maxlength="180" class="form-control" />                <button type="submit" class="blog-button">Send</button>
+            </div>
+                    <div  class="blog-trap form-group" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+        <span>                        
+        
+        </span>
+
+                <input type="text" id="comment_url" name="comment[url]" tabindex="-1" autocomplete="off" class="form-control" /></div>
+            <input type="hidden" id="comment_parent" name="comment[parent]" />
+            <input type="hidden" id="comment_opened" name="comment[opened]" value="*" />
+                        <p class="blog-form-note">No account needed. Read before it appears.</p>
+        <input type="hidden" id="comment_guard_opened" name="comment[guard_opened]" value="*" /><input type="hidden" id="comment__csrf_token" name="comment[_csrf_token]" data-controller="csrf-protection" value="*" /></form>
+    </div>
+    </section>
+<script>
+(function () {
+    // "Répondre": the reply goes under the comment pressed (the hidden parent field), the form scrolled to.
+    var form = document.querySelector('.blog-comment-form form');
+    if (!form) return;
+    var parent = form.querySelector('[name$="[parent]"]'), note = form.querySelector('[data-blog-replying]'), name = form.querySelector('[data-blog-replying-name]');
+    document.querySelectorAll('[data-blog-reply]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            parent.value = button.dataset.blogReply; name.textContent = button.dataset.blogReplyName; note.hidden = false;
+            form.scrollIntoView({behavior: 'smooth', block: 'start'}); form.querySelector('textarea').focus();
+        });
+    });
+    form.querySelector('[data-blog-cancel-reply]').addEventListener('click', function () { parent.value = ''; note.hidden = true; });
+})();
+</script>
+
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Une page écrite en HTML","url":"https://localhost/chroniques/chronique-en-html","mainEntityOfPage":{"@type":"WebPage","@id":"https://localhost/chroniques/chronique-en-html"},"datePublished":"2026-04-08T09:30:00+00:00","dateModified":"2026-05-13T10:00:00+00:00","author":{"@type":"Person","name":"camille.autrice"},"wordCount":220}</script></article>
+</main>
+        <aside></aside>
+    </div>
+            
+            <script src="/bundles/base/base-async.417ee669.js" defer=""></script>
+            
+            <script src="/bundles/base/base-defer.4faa176f.js" defer=""></script>
+    
+            
+            <script src="/bundles/base/form-defer.045eae8d.js" defer=""></script>
+            
+            <script src="/bundles/base/form-defer.editor.f98640e8.js" defer=""></script>
+    
+    </body>
+</html>

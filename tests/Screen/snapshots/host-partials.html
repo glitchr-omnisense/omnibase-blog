@@ -1,0 +1,65 @@
+<article class="blog-card">
+        <div class="blog-card-body">
+        <p class="blog-card-meta"><time datetime="2026-04-08T09:30:00+00:00">April 8, 2026</time>
+<span aria-hidden="true">·</span> 1 min read
+</p>
+        <h3><a href="/chroniques/chronique-en-html">Une page écrite en HTML</a></h3>
+            </div>
+</article>
+<article class="blog-card">
+        <div class="blog-card-body">
+        <p class="blog-card-meta"><time datetime="2026-04-07T09:30:00+00:00">April 7, 2026</time>
+<span aria-hidden="true">·</span> 1 min read
+<a class="blog-pill is-taxon" href="/chroniques/?classe=cycle-3">Cycle 3</a><a class="blog-pill" href="/chroniques?sujet=sorties">Sorties</a><a class="blog-pill" href="/chroniques?sujet=lecture">Lecture</a></p>
+        <h3><a href="/chroniques/chronique-12">Chronique numéro 12</a></h3>
+        <p>Ce qui s&#039;est passé la semaine 12, en quelques lignes qui donnent envie de lire la suite et dépassent un peu les cent quatre-vingts signes pour que la carte les coupe au bon endroit…</p>    </div>
+</article>
+<section class="blog-comments" id="commentaires">
+    
+    
+        <ol class="blog-comment-list">
+                <li class="blog-comment" id="commentaire-comment:book">
+            <article class="blog-comment-body">
+    <header>
+        <b class="blog-comment-name">Une collègue</b>
+                <time datetime="2026-04-01T12:00:00+00:00">April 1, 2026 at 12:00 PM</time>
+    </header>
+    <p>De passage, bravo pour ce blog.</p>
+    <a class="blog-reply is-door" href="/login">Sign in to reply</a></article>
+                                </li>
+            </ol>
+    
+        <div class="blog-comment-form" id="commenter">
+        <form name="comment" method="post" action="/livre-d-or/commenter" class="blog-form" novalidate="novalidate">
+            
+            <p class="blog-replying" data-blog-replying hidden>Replying to <b data-blog-replying-name></b> · <button type="button" data-blog-cancel-reply>cancel</button></p>
+            <textarea id="comment_content" name="comment[content]" required="required" placeholder="Your word…" rows="3" maxlength="4000" class="form-control"></textarea>            <div class="blog-form-line">
+                <input type="text" id="comment_name" name="comment[name]" required="required" placeholder="Your first name or nickname" autocomplete="name" maxlength="120" class="form-control" /><input type="email" id="comment_email" name="comment[email]" placeholder="E-mail (optional, never shown)" autocomplete="email" maxlength="180" class="form-control" />                <button type="submit" class="blog-button">Send</button>
+            </div>
+                    <div  class="blog-trap form-group" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden">
+        <span>                        
+        
+        </span>
+
+                <input type="text" id="comment_url" name="comment[url]" tabindex="-1" autocomplete="off" class="form-control" /></div>
+            <input type="hidden" id="comment_parent" name="comment[parent]" />
+            <input type="hidden" id="comment_opened" name="comment[opened]" value="*" />
+                        <p class="blog-form-note">No account needed. Read before it appears.</p>
+        <input type="hidden" id="comment_guard_opened" name="comment[guard_opened]" value="*" /><input type="hidden" id="comment__csrf_token" name="comment[_csrf_token]" data-controller="csrf-protection" value="*" /></form>
+    </div>
+    </section>
+<script>
+(function () {
+    // "Répondre": the reply goes under the comment pressed (the hidden parent field), the form scrolled to.
+    var form = document.querySelector('.blog-comment-form form');
+    if (!form) return;
+    var parent = form.querySelector('[name$="[parent]"]'), note = form.querySelector('[data-blog-replying]'), name = form.querySelector('[data-blog-replying-name]');
+    document.querySelectorAll('[data-blog-reply]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            parent.value = button.dataset.blogReply; name.textContent = button.dataset.blogReplyName; note.hidden = false;
+            form.scrollIntoView({behavior: 'smooth', block: 'start'}); form.querySelector('textarea').focus();
+        });
+    });
+    form.querySelector('[data-blog-cancel-reply]').addEventListener('click', function () { parent.value = ''; note.hidden = true; });
+})();
+</script>
