@@ -1,20 +1,23 @@
 {#
- # The comments of a post (or of the visitors' book: post = null), one after
- # the other, the replies a step in, and the form. A host page includes it
- # with {post: null} for the book; `comments` and `comment_form` are taken
- # from the blog when the page does not pass them.
+ # The comments of a post (or of the visitors' book), one after the other,
+ # the replies a step in, and the form: a Base\Screen\Discussion, `discussion`,
+ # and the comment form, `comment_form` (Symfony's, beside the model). A host
+ # page includes it with its own `post` (null for the book) and `comments`
+ # (blog_discussion() makes the model of them; on the blog's own post page, a
+ # site's template gets the page's), the form taken from the blog when the page
+ # does not pass it.
  #}
-{% set comments = comments|default(blog_comments(post)) %}
-{% set open = blog_comments_open(post) %}
+{% set discussion = discussion ?? screen.discussion ?? blog_discussion(post ?? null, comments|default(null)) %}
+{% set comments = discussion.comments %}
 {# Anyone writes a word; answering one takes an account (blog.comments.guest_replies). #}
-{% set can_reply = open and blog_can_reply() %}
-{% set form = comment_form|default(open ? blog_comment_form(post) : null) %}
+{% set open = discussion.open %}{% set can_reply = open and discussion.canReply %}
+{% set form = comment_form|default(open ? blog_comment_form(post ?? null) : null) %}
 <section class="blog-comments" id="commentaires">
     {% if heading is not defined or heading %}
     <h2>{{ '@blog.comment.title'|trans({count: comments|length}) }}</h2>
     {% endif %}
 
-    {% for message in app.flashes('blog') %}
+    {% for message in discussion.flashes %}
     <p class="blog-flash">{{ ('@blog.' ~ message)|trans }}</p>
     {% endfor %}
 
@@ -23,7 +26,7 @@
         {% for comment in comments %}
         <li class="blog-comment" id="commentaire-{{ comment.id }}">
             {% include '@Blog/client/_comment.html.twig' with {comment: comment, open: can_reply, sign_in_to_reply: open and not can_reply} %}
-            {% set replies = comment.replies|filter(r => r.visible) %}
+            {% set replies = comment.replies %}
             {% if replies|length %}
             <ol class="blog-comment-replies">
                 {% for reply in replies %}<li class="blog-comment is-reply" id="commentaire-{{ reply.id }}">{% include '@Blog/client/_comment.html.twig' with {comment: reply, open: false} %}</li>{% endfor %}

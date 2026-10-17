@@ -1,9 +1,9 @@
-{# A post on the list: its cover, its subjects, its title and preview. #}
+{# A post on the list (a Base\Screen\Card, `card`; from a host page's own `post` entity, blog_card()): its cover, its subjects, its title and preview. #}{% set card = card ?? blog_card(post) %}
 <article class="blog-card">
-    {% if post.hasCover() %}<a class="blog-card-cover" href="{{ path('blog_post', {slug: post.slug}) }}"><img src="{{ post.getCover()|picture(800) }}" alt="" loading="lazy"></a>{% endif %}
+    {% if card.cover is not null %}<a class="blog-card-cover" href="{{ card.url }}"><img src="{{ card.cover }}" alt="" loading="lazy"></a>{% endif %}
     <div class="blog-card-body">
         <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' %}</p>
-        <h3><a href="{{ path('blog_post', {slug: post.slug}) }}">{{ post.title }}</a></h3>
-        {% if post.excerpt %}<p>{{ post.excerpt|length > 180 ? post.excerpt|slice(0, 180) ~ '…' : post.excerpt }}</p>{% endif %}
+        <h3><a href="{{ card.url }}">{{ card.title }}</a></h3>
+        {% if card.excerpt %}<p>{{ card.excerpt|length > 180 ? card.excerpt|slice(0, 180) ~ '…' : card.excerpt }}</p>{% endif %}
     </div>
 </article>

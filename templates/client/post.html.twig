@@ -1,8 +1,8 @@
-{# One chronicle: its cover, its text (EditorJS or HTML, through omnibase's |wysiwyg), its neighbours, its comments. #}
+{# One chronicle (Base\Blog\Screen\PostPage, `screen`): its cover, its text (EditorJS or HTML, rendered by omnibase's |wysiwyg pipeline), its neighbours, its comments. #}
 {% extends 'layout1.html.twig' %}
 
-{% block title %}{{ post.title }}{% endblock %}
-{% block description %}{{ post.excerpt ?? post.headline ?? '' }}{% endblock %}
+{% block title %}{{ screen.article.title }}{% endblock %}
+{% block description %}{{ screen.article.excerpt ?? screen.article.headline ?? '' }}{% endblock %}
 {% block type %}article{% endblock %}
 
 {% block stylesheets %}{{ parent() }}<link rel="stylesheet" href="{{ asset('bundles/blog/css/blog.css') }}">{% endblock %}
@@ -10,21 +10,21 @@
 {% block content %}
 <article class="blog blog-post">
     <header class="blog-post-head">
-        <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' %}</p>
-        <h1>{{ post.title }}</h1>
-        {% if post.headline %}<p class="blog-lead">{{ post.headline }}</p>{% endif %}
-        {% if post.owners|length %}<p class="blog-byline">{{ '@blog.post.by'|trans({name: post.owners|first}) }}</p>{% endif %}
+        <p class="blog-card-meta">{% include '@Blog/client/_meta.html.twig' with {card: screen.article} %}</p>
+        <h1>{{ screen.article.title }}</h1>
+        {% if screen.article.headline %}<p class="blog-lead">{{ screen.article.headline }}</p>{% endif %}
+        {% if screen.article.authors|length %}<p class="blog-byline">{{ '@blog.post.by'|trans({name: (screen.article.authors|first).name}) }}</p>{% endif %}
     </header>
-    {% if post.hasCover() %}<figure class="blog-post-cover"><img src="{{ post.getCover()|picture(1600) }}" alt=""></figure>{% endif %}
-    <div class="blog-prose">{{ post.content|wysiwyg|raw }}</div>
+    {% if screen.article.cover is not null %}<figure class="blog-post-cover"><img src="{{ screen.article.cover }}" alt=""></figure>{% endif %}
+    <div class="blog-prose">{{ screen.article.html|raw }}</div>
 
     <nav class="blog-neighbours" aria-label="{{ '@blog.post.neighbours'|trans }}">
-        {% if newer %}<a rel="prev" href="{{ path('blog_post', {slug: newer.slug}) }}"><small>{{ '@blog.post.newer'|trans }}</small><span>{{ newer.title }}</span></a>{% else %}<span></span>{% endif %}
-        {% if older %}<a rel="next" href="{{ path('blog_post', {slug: older.slug}) }}"><small>{{ '@blog.post.older'|trans }}</small><span>{{ older.title }}</span></a>{% endif %}
+        {% if screen.next %}<a rel="prev" href="{{ screen.next.url }}"><small>{{ '@blog.post.newer'|trans }}</small><span>{{ screen.next.title }}</span></a>{% else %}<span></span>{% endif %}
+        {% if screen.prev %}<a rel="next" href="{{ screen.prev.url }}"><small>{{ '@blog.post.older'|trans }}</small><span>{{ screen.prev.title }}</span></a>{% endif %}
     </nav>
 
-    {% include '@Blog/client/_comments.html.twig' with {post: post, comments: comments, comment_form: comment_form|default(null)} %}
+    {% include '@Blog/client/_comments.html.twig' with {discussion: screen.discussion, comment_form: comment_form|default(null)} %}
 
-    {% if jsonld|default(null) %}<script type="application/ld+json">{{ jsonld|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}</script>{% endif %}
+    {% if screen.jsonLd %}<script type="application/ld+json">{{ screen.jsonLd|json_encode(constant('JSON_UNESCAPED_SLASHES') b-or constant('JSON_UNESCAPED_UNICODE') b-or constant('JSON_HEX_TAG'))|raw }}</script>{% endif %}
 </article>
 {% endblock %}

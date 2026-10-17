@@ -1,11 +1,11 @@
-{# One comment: who, when, what; "répondre" on the top-level ones while the form is open - to those who may reply; the others are shown the door. #}
+{# One comment (a Base\Screen\Comment or Reply): who, when, what; "répondre" on the top-level ones while the form is open - to those who may reply; the others are shown the door. #}{% set author = comment.authors|first %}
 <article class="blog-comment-body">
     <header>
-        <b class="blog-comment-name">{% if comment.website %}<a href="{{ comment.website }}" rel="nofollow ugc noopener" target="_blank">{{ comment.displayName }}</a>{% else %}{{ comment.displayName }}{% endif %}</b>
-        {% if comment.author and comment.author.roles|filter(r => r != 'ROLE_USER')|length %}<span class="blog-pill is-author">{{ '@blog.comment.author'|trans }}</span>{% endif %}
-        <time datetime="{{ comment.createdAt|date('c') }}">{{ comment.createdAt|format_datetime('long', 'short') }}</time>
+        <b class="blog-comment-name">{% if author.profile %}<a href="{{ author.profile }}" rel="nofollow ugc noopener" target="_blank">{{ author.name }}</a>{% else %}{{ author.name }}{% endif %}</b>
+        {% if author.staff %}<span class="blog-pill is-author">{{ '@blog.comment.author'|trans }}</span>{% endif %}
+        <time datetime="{{ comment.publishedAt|date('c') }}">{{ comment.publishedAt|format_datetime('long', 'short') }}</time>
     </header>
     <p>{{ comment.content|nl2br }}</p>
-    {% if open %}<button type="button" class="blog-reply" data-blog-reply="{{ comment.id }}" data-blog-reply-name="{{ comment.displayName }}">{{ '@blog.comment.reply'|trans }}</button>
-    {% elseif sign_in_to_reply ?? false %}<a class="blog-reply is-door" href="{{ path('security_login') }}">{{ '@blog.comment.reply_signed_in'|trans }}</a>{% endif %}
+    {% if open %}<button type="button" class="blog-reply" data-blog-reply="{{ comment.id }}" data-blog-reply-name="{{ author.name }}">{{ '@blog.comment.reply'|trans }}</button>
+    {% elseif sign_in_to_reply ?? false %}<a class="blog-reply is-door" href="{{ discussion.signIn }}">{{ '@blog.comment.reply_signed_in'|trans }}</a>{% endif %}
 </article>

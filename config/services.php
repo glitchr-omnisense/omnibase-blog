@@ -29,6 +29,11 @@ return function (ContainerConfigurator $configurator) {
             $src.'/WordPress/Context.php',
             $src.'/WordPress/Result.php',
             $src.'/WordPress/LinkRewriter.php',
+            // The screens' view models, values; BlogScreens, which builds them, is a service.
+            $src.'/Screen/BlogPage.php',
+            $src.'/Screen/PostPage.php',
+            $src.'/Screen/BookPage.php',
+            $src.'/Screen/FeedPage.php',
         ]);
 
     $services->load('Base\\Blog\\Controller\\Client\\', $src.'/Controller/Client/')
