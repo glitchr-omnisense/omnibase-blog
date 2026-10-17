@@ -3,11 +3,13 @@
 namespace Base\Blog\Tests\Screen;
 
 use Base\Blog\Entity\Post;
+use Base\Contract\Runtime;
 use Base\Entity\Thread\Comment;
 use Base\Entity\Thread\Tag;
 use Base\Entity\Thread\Taxon;
 use Base\Enum\CommentState;
 use Doctrine\ORM\EntityManagerInterface;
+use Psr\Clock\ClockInterface;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -55,22 +57,35 @@ final class BlogPagesSnapshotTest extends KernelTestCase
 
     protected function tearDown(): void
     {
+        if (class_exists(Runtime::class)) {
+            Runtime::set(ClockInterface::class, null);
+        }
         self::ensureKernelShutdown();
         self::bootKernel();
-        $connection = $this->em()->getConnection();
+        // Removed for good: a thread or a user removed once is in the bin (Trasheable), removed again it is gone - the trash filter off to find it there.
+        $em = $this->em();
         foreach (array_reverse($this->created) as [$class, $id]) {
-            $entity = $this->em()->find($class, $id);
-            if (null !== $entity) {
-                $this->em()->remove($entity);
-                $this->em()->flush();
-                // Trasheable: a thread removed once is in the bin; removed again, gone.
-                if (null !== $this->em()->find($class, $id)) {
-                    $this->em()->remove($this->em()->find($class, $id));
-                    $this->em()->flush();
-                }
+            if (null !== $entity = $em->find($class, $id)) {
+                $em->remove($entity);
+                $em->flush();
             }
         }
-        unset($connection);
+        $em->clear();
+        if ($em->getFilters()->isEnabled('trash_filter')) {
+            $em->getFilters()->disable('trash_filter');
+        }
+        foreach (array_reverse($this->created) as [$class, $id]) {
+            if (null !== $entity = $em->find($class, $id)) {
+                $em->remove($entity);
+                $em->flush();
+            }
+        }
+        // A user's profile (userProfile, a row of its own) outlives the user: gone too, its username free for the next test.
+        $users = array_map(static fn ($entry) => $entry[1], array_filter($this->created, static fn ($entry) => 'App\\Entity\\User' === $entry[0]));
+        if ($users && \in_array('userProfile', $em->getConnection()->createSchemaManager()->listTableNames(), true)) {
+            $em->getConnection()->executeStatement('DELETE FROM userProfile WHERE id IN (?)', [$users], [\Doctrine\DBAL\ArrayParameterType::INTEGER]);
+        }
+        $this->created = [];
         parent::tearDown();
     }
 
@@ -110,6 +125,87 @@ final class BlogPagesSnapshotTest extends KernelTestCase
         if ($written) {
             self::markTestIncomplete('Snapshots written: '.implode(', ', $written).'.');
         }
+    }
+
+    /**
+     * The same pages as data (plan "omnibase agnostique", C5): the frame's and
+     * the screen's props together, as a front end asks them - omnibridge/react's
+     * protocol where it is installed, else a request asking JSON alone. The
+     * screens' clock is set the day after the newest post: that one is recent,
+     * the others are not (no template compares a moment). A visitor's props are
+     * private to them.
+     */
+    public function testTheBlogsScreensAreGivenAsData(): void
+    {
+        if (!class_exists(Runtime::class) || !class_exists('Base\\Bridge\\Symfony\\ScreenResponder')) {
+            self::markTestSkipped('Needs omniscient/omnibase with the screens (C5).');
+        }
+        $this->seed();
+        Runtime::set(ClockInterface::class, new class implements ClockInterface {
+            public function now(): \DateTimeImmutable
+            {
+                return new \DateTimeImmutable('2026-04-09 12:00:00', new \DateTimeZone('UTC'));
+            }
+        });
+        $member = $this->em()->find('App\\Entity\\User', $this->ids['member']);
+
+        $index = $this->props('/chroniques');
+        self::assertSame(['locale', 'site', 'links', 'viewer', 'theme', 'page', 'pages', 'found', 'next', 'articles', 'prev', 'headline', 'topics', 'topic', 'taxon', 'month', 'months'], \array_slice(array_keys($index), 0, 17));
+        self::assertSame([1, 2, 14, '/chroniques?page=2', null], [$index['page'], $index['pages'], $index['found'], $index['next'], $index['prev']]);
+        self::assertSame('chronique-en-html', $index['articles'][0]['slug']);
+        self::assertSame(['2026-04-08T09:30:00+00:00', true], [$index['articles'][0]['publishedAt'], $index['articles'][0]['recent']], 'published the day before the clock\'s now');
+        self::assertSame([false], array_values(array_unique(array_map(static fn ($card) => $card['recent'], \array_slice($index['articles'], 1)))));
+        self::assertSame([null, null, null], [$index['articles'][0]['likes'], $index['articles'][0]['likeUrl'], $index['articles'][0]['comments']], 'the blog counts none: null, never 0');
+        self::assertSame('chronique-05', $index['headline']['slug']);
+        self::assertSame([['slug' => 'lecture', 'current' => false], ['slug' => 'sorties', 'current' => false]], array_map(static fn ($tag) => array_intersect_key($tag, ['slug' => 0, 'current' => 0]), $index['topics']));
+        self::assertSame(['year' => 2026, 'months' => [['month' => 4, 'count' => 7, 'url' => '/chroniques/2026/4'], ['month' => 3, 'count' => 7, 'url' => '/chroniques/2026/3']]], $index['months'][0]);
+        self::assertNull($index['viewer']);
+
+        $post = $this->props('/chroniques/chronique-commentee', $member, $response);
+        self::assertSame(['article', 'prev', 'next', 'connex', 'discussion', 'jsonLd'], \array_slice(array_keys($post), 5));
+        self::assertSame(['La sortie au musée', true, 'STATE_PUBLISH'], [$post['article']['title'], $post['article']['commentable'], $post['article']['state']]);
+        self::assertSame([['tag' => 'h2', 'slug' => 'le-depart-a-l-aube', 'title' => "Le départ à l'aube"], ['tag' => 'h2', 'slug' => 'le-retour', 'title' => 'Le retour']], $post['article']['toc']);
+        self::assertSame(['Chronique numéro 6', '/chroniques/chronique-06'], [$post['prev']['title'], $post['prev']['url']]);
+        self::assertSame(['Chronique numéro 8', '/chroniques/chronique-08'], [$post['next']['title'], $post['next']['url']]);
+        $discussion = $post['discussion'];
+        self::assertSame([true, true, '/login'], [$discussion['open'], $discussion['canReply'], $discussion['signIn']]);
+        self::assertSame([$this->ids['comment:staff'], $this->ids['comment:first']], array_map(static fn ($comment) => $comment['id'], $discussion['comments']));
+        self::assertSame([['name' => 'camille.autrice', 'profile' => null, 'avatar' => null, 'staff' => true]], $discussion['comments'][0]['authors']);
+        self::assertSame(['Inès', 'https://ines.example.org', false], [$discussion['comments'][1]['authors'][0]['name'], $discussion['comments'][1]['authors'][0]['profile'], $discussion['comments'][1]['authors'][0]['staff']]);
+        self::assertSame([$this->ids['comment:reply']], array_map(static fn ($reply) => $reply['id'], $discussion['comments'][1]['replies']), 'the spam hidden, the reply under its comment');
+        self::assertSame('louis.membre', $post['viewer']['name']);
+        self::assertTrue($response->headers->hasCacheControlDirective('private'), 'a visitor\'s props are theirs alone');
+        self::assertContains('Cookie', $response->getVary());
+
+        $book = $this->props('/livre-d-or');
+        self::assertSame(['De passage, bravo pour ce blog.'], array_map(static fn ($comment) => $comment['content'], $book['discussion']['comments']));
+    }
+
+    /**
+     * A page's props, as a front end asks them.
+     *
+     * @return array<string, mixed>
+     */
+    private function props(string $path, ?object $user = null, ?Response &$response = null): array
+    {
+        $protocol = class_exists('Omnibridge\\React\\Protocol');
+        $server = $protocol ? ['HTTP_X_OMNIBRIDGE' => 'true'] : ['HTTP_ACCEPT' => 'application/json'];
+        self::ensureKernelShutdown();
+        self::bootKernel();
+        $request = Request::create('https://localhost'.$path, 'GET', [], [], [], $server);
+        if ($user) {
+            $session = static::getContainer()->get('session.factory')->createSession();
+            $user = $this->em()->find($user::class, $user->getId());
+            $session->set('_security_main', serialize(new UsernamePasswordToken($user, 'main', $user->getRoles())));
+            $session->save();
+            $request->cookies->set($session->getName(), $session->getId());
+        }
+        $response = static::$kernel->handle($request);
+        self::assertSame(200, $response->getStatusCode(), $path.': '.substr((string) $response->getContent(), 0, 2000));
+        self::assertStringContainsString('json', (string) $response->headers->get('Content-Type'));
+        $data = json_decode((string) $response->getContent(), true);
+
+        return $protocol ? $data['props'] : $data;
     }
 
     /** The values a page draws anew at each request, set aside; the comments' ids by their names (another suite may have numbered before). */

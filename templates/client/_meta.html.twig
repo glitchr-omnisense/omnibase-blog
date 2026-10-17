@@ -1,5 +1,5 @@
-{# The line under a title: the date, the reading time, the taxa and tags as pills. #}
-<time datetime="{{ post.publishedAt|date('c') }}">{{ post.publishedAt|format_date('long') }}</time>
-<span aria-hidden="true">·</span> {{ '@blog.post.reading'|trans({minutes: post.readingMinutes}) }}
-{% for taxon in post.taxa %}<a class="blog-pill is-taxon" href="{{ path('blog_index', {classe: taxon.slug}) }}">{{ taxon.label }}</a>{% endfor %}
-{% for tag in post.tags %}<a class="blog-pill" href="{{ path('blog_index', {sujet: tag.slug}) }}">{{ tag.label }}</a>{% endfor %}
+{# The line under a title (a Base\Screen\Card or Story, `card`; from a host page's own `post` entity, blog_card()): the date, the reading time, the taxa and tags as pills. #}{% set card = card ?? blog_card(post) %}
+<time datetime="{{ card.publishedAt|date('c') }}">{{ card.publishedAt|format_date('long') }}</time>
+<span aria-hidden="true">·</span> {{ '@blog.post.reading'|trans({minutes: card.readingMinutes}) }}
+{% for taxon in card.taxa %}<a class="blog-pill is-taxon" href="{{ taxon.url }}">{{ taxon.label }}</a>{% endfor %}
+{% for tag in card.tags %}<a class="blog-pill" href="{{ tag.url }}">{{ tag.label }}</a>{% endfor %}

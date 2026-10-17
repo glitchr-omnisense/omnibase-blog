@@ -9,6 +9,10 @@ use Base\Repository\Thread\CommentRepository;
 use Base\Blog\Repository\PostRepository;
 use Base\Service\CommentGuard;
 use Base\Blog\Service\CommentNotifier;
+use Base\Blog\Service\CommentPolicy;
+use Base\Blog\Screen\BlogScreens;
+use Base\Bridge\Symfony\ScreenResponder;
+use Base\Screen\View;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
@@ -44,16 +48,23 @@ class CommentController extends AbstractController
         #[Autowire('%blog.comments.flood_interval%')] private readonly int $floodInterval = 60,
         // glitchr/ux-google, when installed: reCAPTCHA v3 on the form once google.recaptcha.enable is on.
         private readonly ?\Google\Service\GrService $recaptcha = null,
+        // Who may write and answer (the same blog.comments.* settings), and the pages shown again with a form's errors.
+        private ?CommentPolicy $policy = null,
+        private readonly ?BlogScreens $screens = null,
+        private readonly ?ScreenResponder $responder = null,
     ) {
+        $this->policy ??= new CommentPolicy($this->enabled, $this->guestAllowed, $this->guestReplies);
     }
 
-    /** The visitors' book: the comments with no post, and the form. */
+    /** The visitors' book: the comments with no post, and the form (a template and its view model, plan "omnibase agnostique", C5). */
     #[Route('/livre-d-or', name: 'blog_book')]
-    public function book(): Response
+    public function book(Request $request): Response
     {
-        return $this->render('@Blog/client/book.html.twig', [
-            'comments' => $this->comments->findVisible(null),
-        ]);
+        $screen = $this->screens->book();
+
+        return $this->responder->respond($request, new View('@Blog/client/book.html.twig', $screen, 'Blog/Book'), [
+            'comment_form' => $screen->discussion->open ? $this->form(null)->createView() : null,
+        ] + BlogController::legacy($this->container->get('twig'), '@Blog/client/book.html.twig', fn () => ['comments' => $this->comments->findVisible(null)]));
     }
 
     #[Route('/livre-d-or/commenter', name: 'blog_book_comment', methods: ['POST'])]
@@ -92,13 +103,13 @@ class CommentController extends AbstractController
 
     public function isOpen(?Post $post): bool
     {
-        return $this->enabled && ($this->guestAllowed || $this->getUser()) && (null === $post || $post->isCommentsOpen());
+        return $this->policy->isOpen($post, null !== $this->getUser());
     }
 
     /** Answering a comment: an account, unless blog.comments.guest_replies opens it to everyone. */
     public function canReply(): bool
     {
-        return $this->guestReplies || null !== $this->getUser();
+        return $this->policy->canReply(null !== $this->getUser());
     }
 
     private function handle(Request $request, ?Post $post, string $back): Response
@@ -146,13 +157,18 @@ class CommentController extends AbstractController
             return $this->redirect($back.($comment->isVisible() ? '#commentaire-'.$comment->getId() : '#commentaires'));
         }
 
-        // Back on the page with the errors: the post or the book, re-rendered.
-        $parameters = ['comments' => $this->comments->findVisible($post), 'comment_form' => $form->createView()];
-        if ($post) {
-            [$older, $newer] = $this->posts->findNeighbours($post);
-            $parameters += ['post' => $post, 'older' => $older, 'newer' => $newer];
-        }
+        // Back on the page with the errors: the post or the book, shown again from their view models (the post without schema.org's description, as before).
+        $template = $post ? '@Blog/client/post.html.twig' : '@Blog/client/book.html.twig';
+        $view = new View($template, $post ? $this->screens->post($post) : $this->screens->book(), $post ? 'Blog/Post' : 'Blog/Book', Response::HTTP_UNPROCESSABLE_ENTITY);
 
-        return $this->render($post ? '@Blog/client/post.html.twig' : '@Blog/client/book.html.twig', $parameters, new Response(null, Response::HTTP_UNPROCESSABLE_ENTITY));
+        return $this->responder->respond($request, $view, ['comment_form' => $form->createView()] + BlogController::legacy($this->container->get('twig'), $template, function () use ($post): array {
+            $parameters = ['comments' => $this->comments->findVisible($post)];
+            if ($post) {
+                [$older, $newer] = $this->posts->findNeighbours($post);
+                $parameters += ['post' => $post, 'older' => $older, 'newer' => $newer];
+            }
+
+            return $parameters;
+        }));
     }
 }
