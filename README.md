@@ -10,7 +10,7 @@ HTML), tags, taxa, owners, followers, likes, a slug, publish states and
 scheduling, revisions, soft delete, translations - and the bundle only adds
 a cover, a "featured" flag and the reading time.
 
-A comment is glitchr/omnibase's `Base\Entity\Thread\Comment` (table
+A comment is omniscient/omnibase's `Base\Entity\Thread\Comment` (table
 `threadComment`, its `thread` the post - none: the visitors' book; see
 `docs/comments.md`): a name, an e-mail, a text, a parent for a reply, and a
 state. It implements omnibase's `SpamProtectionInterface`, so the
