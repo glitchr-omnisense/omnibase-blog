@@ -150,7 +150,8 @@ final class BlogPagesSnapshotTest extends KernelTestCase
         $member = $this->em()->find('App\\Entity\\User', $this->ids['member']);
 
         $index = $this->props('/chroniques');
-        self::assertSame(['locale', 'site', 'links', 'viewer', 'theme', 'page', 'pages', 'found', 'next', 'articles', 'prev', 'headline', 'topics', 'topic', 'taxon', 'month', 'months'], \array_slice(array_keys($index), 0, 17));
+        self::assertSame(['locale', 'site', 'links', 'viewer', 'theme', 'page', 'pages', 'found', 'next', 'articles', 'prev', 'headline', 'topics', 'topic', 'taxon', 'month', 'months', 'indexUrl', 'feedUrl'], \array_slice(array_keys($index), 0, 19));
+        self::assertSame(['/chroniques', '/chroniques/feed.xml'], [$index['indexUrl'], $index['feedUrl']], 'the list\'s and the feed\'s addresses reach the props (they were lost under the frame\'s links)');
         self::assertSame([1, 2, 14, '/chroniques?page=2', null], [$index['page'], $index['pages'], $index['found'], $index['next'], $index['prev']]);
         self::assertSame('chronique-en-html', $index['articles'][0]['slug']);
         self::assertSame(['2026-04-08T09:30:00+00:00', true], [$index['articles'][0]['publishedAt'], $index['articles'][0]['recent']], 'published the day before the clock\'s now');

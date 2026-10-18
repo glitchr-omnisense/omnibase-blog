@@ -8,25 +8,25 @@ use Base\Screen\Shape;
 
 /**
  * The RSS feed: the channel's title (the site's name, else the host it is
- * asked at), the list's and the feed's absolute addresses, the last posts
- * (their absolute addresses).
+ * asked at), the list's and the feed's absolute addresses (indexUrl, feedUrl:
+ * the frame owns `links`), the last posts (their absolute addresses).
  */
 final readonly class FeedPage implements Screen
 {
     /**
-     * @param array{index: string, feed: string} $links
-     * @param list<Card>                         $items
+     * @param list<Card> $items
      */
     public function __construct(
         public string $title,
-        public array $links,
+        public string $indexUrl,
+        public string $feedUrl,
         public array $items,
     ) {
     }
 
     public function toArray(): array
     {
-        return ['title' => $this->title, 'links' => $this->links, 'items' => Shape::export($this->items)];
+        return ['title' => $this->title, 'indexUrl' => $this->indexUrl, 'feedUrl' => $this->feedUrl, 'items' => Shape::export($this->items)];
     }
 
     public function jsonSerialize(): array

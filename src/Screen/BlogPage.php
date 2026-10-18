@@ -14,7 +14,7 @@ use Base\Screen\Tag;
  * filter by (the one asked marked current), the topic or taxon asked (their
  * slugs), the month of a month's page (its first day, ISO), the archive's
  * years and months (newest first, each with its count and address), and the
- * list's and the feed's addresses.
+ * list's and the feed's addresses (indexUrl, feedUrl: the frame owns `links`).
  */
 final readonly class BlogPage implements Screen
 {
@@ -22,7 +22,6 @@ final readonly class BlogPage implements Screen
      * @param list<Card>                                                                         $articles
      * @param list<Tag>                                                                          $topics
      * @param list<array{year: int, months: list<array{month: int, count: int, url: string}>}> $months
-     * @param array{index: string, feed: string}                                                 $links
      */
     public function __construct(
         public int $page,
@@ -37,7 +36,8 @@ final readonly class BlogPage implements Screen
         public ?string $taxon = null,
         public ?string $month = null,
         public array $months = [],
-        public array $links = [],
+        public ?string $indexUrl = null,
+        public ?string $feedUrl = null,
     ) {
     }
 
@@ -56,7 +56,8 @@ final readonly class BlogPage implements Screen
             'taxon' => $this->taxon,
             'month' => $this->month,
             'months' => $this->months,
-            'links' => $this->links,
+            'indexUrl' => $this->indexUrl,
+            'feedUrl' => $this->feedUrl,
         ];
     }
 
