@@ -19,12 +19,12 @@
             <h1>{{ screen.month is not null ? screen.month|format_datetime(pattern: 'LLLL yyyy')|capitalize : (screen.topic ? screen.topic : '@blog.index.title'|trans) }}</h1>
             <p class="blog-lead">{{ '@blog.index.lead'|trans }}</p>
         </div>
-        <a class="blog-feed" href="{{ screen.links.feed }}" title="RSS"><i class="fa-solid fa-rss" aria-hidden="true"></i> RSS</a>
+        <a class="blog-feed" href="{{ screen.feedUrl }}" title="RSS"><i class="fa-solid fa-rss" aria-hidden="true"></i> RSS</a>
     </header>
 
     {% if screen.topics %}
     <nav class="blog-topics" aria-label="{{ '@blog.index.topics'|trans }}">
-        <a href="{{ screen.links.index }}" {{ not screen.topic ? 'aria-current="page"' }}>{{ '@blog.index.all'|trans }}</a>
+        <a href="{{ screen.indexUrl }}" {{ not screen.topic ? 'aria-current="page"' }}>{{ '@blog.index.all'|trans }}</a>
         {% for t in screen.topics %}<a href="{{ t.url }}" {{ t.current ? 'aria-current="page"' }}>{{ t.label }}</a>{% endfor %}
     </nav>
     {% endif %}

@@ -65,7 +65,8 @@ class BlogScreens
             topic: $topic,
             taxon: $taxon,
             months: $this->months(),
-            links: $this->links(),
+            indexUrl: $this->urls->path('blog_index'),
+            feedUrl: $this->urls->path('blog_feed'),
         );
     }
 
@@ -83,7 +84,8 @@ class BlogScreens
             topics: $this->topics(null),
             month: Shape::moment(new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month))),
             months: $this->months(),
-            links: $this->links(),
+            indexUrl: $this->urls->path('blog_index'),
+            feedUrl: $this->urls->path('blog_feed'),
         );
     }
 
@@ -127,7 +129,8 @@ class BlogScreens
     {
         return new FeedPage(
             title: $this->context->frame()->site->title ?? $host,
-            links: ['index' => $this->urls->url('blog_index'), 'feed' => $this->urls->url('blog_feed')],
+            indexUrl: $this->urls->url('blog_index'),
+            feedUrl: $this->urls->url('blog_feed'),
             items: array_map(fn (Post $post) => $this->stories->card($post, $this->urls->url('blog_post', ['slug' => $post->getSlug()]), readingMinutes: $post->getReadingMinutes()), $this->posts->findPublishedPage(1, 20)),
         );
     }
@@ -191,12 +194,6 @@ class BlogScreens
         }
 
         return $years;
-    }
-
-    /** @return array{index: string, feed: string} */
-    private function links(): array
-    {
-        return ['index' => $this->urls->path('blog_index'), 'feed' => $this->urls->path('blog_feed')];
     }
 
     private function tagUrl(object $tag): string

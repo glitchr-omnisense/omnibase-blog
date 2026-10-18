@@ -2,8 +2,8 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
     <title>{{ screen.title }} — {{ '@blog.index.title'|trans }}</title>
-    <link>{{ screen.links.index }}</link>
-    <atom:link href="{{ screen.links.feed }}" rel="self" type="application/rss+xml"/>
+    <link>{{ screen.indexUrl }}</link>
+    <atom:link href="{{ screen.feedUrl }}" rel="self" type="application/rss+xml"/>
     <description>{{ '@blog.index.description'|trans }}</description>
     <language>{{ frame.locale }}</language>
     {% for item in screen.items %}
