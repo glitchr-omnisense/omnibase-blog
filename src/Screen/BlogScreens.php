@@ -6,13 +6,13 @@ use Base\Blog\Entity\Post;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Service\CommentPolicy;
 use Base\Blog\Service\JsonLd;
-use Base\Contract\Urls;
 use Base\Repository\Thread\CommentRepository;
 use Base\Screen\Builder\Stories;
 use Base\Screen\Card;
 use Base\Screen\ContextProvider;
 use Base\Screen\Discussion;
 use Base\Screen\Shape;
+use Omnibridge\Contract\Urls;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**
