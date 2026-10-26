@@ -138,7 +138,7 @@ final class BlogPagesSnapshotTest extends KernelTestCase
     public function testTheBlogsScreensAreGivenAsData(): void
     {
         if (!class_exists(Runtime::class) || !class_exists('Base\\Bridge\\Symfony\\ScreenResponder')) {
-            self::markTestSkipped('Needs omniscient/omnibase with the screens (C5).');
+            self::markTestSkipped('Needs omnisense/omnibase with the screens (C5).');
         }
         $this->seed();
         Runtime::set(ClockInterface::class, new class implements ClockInterface {
