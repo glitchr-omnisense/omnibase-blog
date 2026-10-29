@@ -120,7 +120,7 @@ final class BlogPagesSnapshotTest extends KernelTestCase
                 $written[] = $name;
                 continue;
             }
-            self::assertSame(file_get_contents($file), $html, sprintf('The page "%s" is not the one recorded (%s).', $name, $file));
+            self::assertSame($this->normalize((string) file_get_contents($file)), $html, sprintf('The page "%s" is not the one recorded (%s).', $name, $file));
         }
         if ($written) {
             self::markTestIncomplete('Snapshots written: '.implode(', ', $written).'.');
@@ -216,6 +216,9 @@ final class BlogPagesSnapshotTest extends KernelTestCase
         $html = preg_replace_callback('~(commentaire-|data-blog-reply=")(\d+)~', static fn ($m) => $m[1].($names[(int) $m[2]] ?? $m[2]), $html);
         $html = preg_replace('~(name="[^"]*\[(?:_token|_csrf_token|opened|guard_opened|guard_captcha)\]"[^>]*?value=")[^"]*(")~', '$1*$2', $html);
         $html = preg_replace('~(value=")[^"]*("[^>]*name="[^"]*\[(?:_token|_csrf_token|opened|guard_opened|guard_captcha)\]")~', '$1*$2', $html);
+        // The host's built core assets (base-async, base-defer, form-defer...: /bundles/base/<entry>.<hash>.css|js) are
+        // the host's, not the blog's: printed only where the entry points were built, their hash changing at each build.
+        $html = preg_replace('~^[ \t]*<(?:link rel="stylesheet" href|script src)="/bundles/base/[^"]+\.[0-9a-f]{8}\.(?:css|js)"[^>]*>(?:</script>)?\R~m', '', $html);
 
         return $html;
     }

@@ -86,13 +86,14 @@ class PostRepository extends ServiceEntityRepository
         return [$older, $newer];
     }
 
-    /** @return list<Tag> the topics of the published posts */
+    /** @return list<Tag> the topics of the posts on the site: published, and their publication date come */
     public function findTopics(): array
     {
         return $this->getEntityManager()->getRepository(Tag::class)->createQueryBuilder('t')
             ->innerJoin('t.threads', 'p')
             ->andWhere('p INSTANCE OF :class')->setParameter('class', $this->getClassMetadata()->discriminatorValue)
             ->andWhere('p.state = :published')->setParameter('published', ThreadState::PUBLISH)
+            ->andWhere('p.publishedAt IS NULL OR p.publishedAt <= CURRENT_TIMESTAMP()') // as published(): a post scheduled for later is not on the site yet
             ->groupBy('t.id')
             ->orderBy('t.priority', 'DESC')->addOrderBy('t.slug', 'ASC')
             ->getQuery()->getResult();

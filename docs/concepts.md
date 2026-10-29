@@ -53,14 +53,9 @@ page, feed and sitemap until then (`PostRepository::published()`).
 | `findHeadline()` | the featured post, else the newest |
 | `findOnePublished($slug)` | one published post |
 | `findNeighbours($post)` | the older and the newer post |
-| `findTopics()` | the tags of the published posts, by priority then slug |
+| `findTopics()` | the tags of the posts on the site (published, their publication date come), by priority then slug |
 | `countByMonth()` | year, then month, then the count, for the archive |
 | `findByMonth($year, $month)` | the posts of a month |
-
-> [!WARNING]
-> Known defect: `findTopics()` reads the state only, not the publication
-> date: the tag of a post scheduled for later is listed among the topics, and
-> its topic page is empty until the post comes out.
 
 Pages are cut by hand (first result, max results), not with Doctrine's
 paginator, whose output walker does not work with omnisense/omnibase's SQL
