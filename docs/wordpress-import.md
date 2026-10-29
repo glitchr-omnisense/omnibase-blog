@@ -1,3 +1,8 @@
+---
+title: "Moving a WordPress site in: blog:import-wordpress"
+order: 35
+---
+
 # Moving a WordPress site in: `blog:import-wordpress`
 
 ```bash
