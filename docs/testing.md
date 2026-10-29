@@ -61,9 +61,6 @@ Every date is fixed; the CSRF token, the form's opening time and the guard's
 stamp are set aside. A missing snapshot is written and the test marked
 incomplete; `BLOG_SNAPSHOT_RECORD=1` writes them all again.
 
-> [!WARNING]
-> Known defect: the recorded pages hold the stylesheets and scripts of a host
-> that has omnisense/omnibase's built assets (`base-async`, `base-defer`,
-> `form-defer` entry points). In omnisense/omnibase-harness those tags are not
-> printed, so "The blog's pages are those recorded" fails there on the first
-> page compared (`index`), though the pages are otherwise the same.
+The host's built core assets (`/bundles/base/<entry>.<hash>.css|js`: the `base-async`,
+`base-defer`, `form-defer` entry points) are set aside on both sides: they are printed only
+where the host built them, and their hash changes at each build.
