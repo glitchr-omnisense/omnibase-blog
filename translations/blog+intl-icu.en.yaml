@@ -70,6 +70,8 @@ admin:
     taxa: "Classification (level, subject)"
     cover: "Picture"
   comment:
+    singular: "Comment"
+    plural: "Comments"
     state: "State"
     name: "Name"
     email: "E-mail"

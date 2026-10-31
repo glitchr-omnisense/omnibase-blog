@@ -1,0 +1,6 @@
+# The names of omnibase/blog's entities, which omnibase/admin titles its screens with
+# (fr of /admin/posts).
+blog:
+  post:
+    _singular: "article"
+    _plural: "articles"

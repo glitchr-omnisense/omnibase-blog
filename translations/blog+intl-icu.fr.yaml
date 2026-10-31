@@ -70,6 +70,8 @@ admin:
     taxa: "Classement (niveau, matière)"
     cover: "Image"
   comment:
+    singular: "Commentaire"
+    plural: "Commentaires"
     state: "État"
     name: "Nom"
     email: "E-mail"

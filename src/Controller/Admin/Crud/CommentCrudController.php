@@ -6,6 +6,7 @@ use Base\Admin\Attribute\AdminAction;
 use Base\Admin\Attribute\OpenToAdmins;
 use Base\Admin\Config\Action;
 use Base\Admin\Config\Actions;
+use Base\Admin\Config\Crud;
 use Base\Admin\Controller\AbstractCrudController;
 use Base\Admin\Filter\Filters;
 use Base\Entity\Thread\Comment;
@@ -46,6 +47,17 @@ class CommentCrudController extends AbstractCrudController
     public static function getPreferredIcon(): ?string
     {
         return 'fa-solid fa-comments';
+    }
+
+    /**
+     * The screen of the core's Comment, named by the blog that moderates it:
+     * the core gives that entity no name, and the page read "Comment".
+     */
+    public function configureCrud(Crud $crud): Crud
+    {
+        return parent::configureCrud($crud)
+            ->setEntityLabelInSingular('@blog.admin.comment.singular')
+            ->setEntityLabelInPlural('@blog.admin.comment.plural');
     }
 
     public function configureFilters(Filters $filters): Filters

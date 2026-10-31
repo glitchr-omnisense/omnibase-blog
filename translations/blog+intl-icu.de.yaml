@@ -70,6 +70,8 @@ admin:
     taxa: "Einordnung (Stufe, Fach)"
     cover: "Bild"
   comment:
+    singular: "Kommentar"
+    plural: "Kommentare"
     state: "Status"
     name: "Name"
     email: "E-Mail"
