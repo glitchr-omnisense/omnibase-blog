@@ -2,6 +2,7 @@
 
 namespace Base\Blog\Entity;
 
+use Base\Contract\Link;
 use Base\Blog\Repository\PostRepository;
 use Base\Database\Attribute\DiscriminatorEntry;
 use Base\Database\Attribute\Uploader;
@@ -35,7 +36,7 @@ class Post extends Thread implements LinkableInterface
 
     public function __toLink(array $routeParameters = [], int $referenceType = UrlGeneratorInterface::ABSOLUTE_PATH): ?string
     {
-        return $this->getRouter()->generate('blog_post', array_merge($routeParameters, ['slug' => $this->getSlug()]), $referenceType);
+        return Link::to('blog_post', array_merge($routeParameters, ['slug' => $this->getSlug()]), $referenceType);
     }
 
     /** The picture at the top of the post and on its card: an upload. */
