@@ -5,7 +5,7 @@ namespace Base\Blog\Controller\Client;
 use Base\Blog\Entity\Post;
 use Base\Form\Type\CommentType;
 use Base\Form\Model\CommentModel;
-use Base\Repository\Thread\CommentRepository;
+use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
 use Base\Service\CommentGuard;
 use Base\Blog\Service\CommentNotifier;
@@ -34,7 +34,7 @@ class CommentController extends AbstractController
 {
     public function __construct(
         private readonly PostRepository $posts,
-        private readonly CommentRepository $comments,
+        private readonly Comments $comments,
         private readonly EntityManagerInterface $entityManager,
         private readonly CommentGuard $guard,
         private readonly CommentNotifier $notifier,

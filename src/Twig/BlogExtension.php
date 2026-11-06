@@ -4,7 +4,7 @@ namespace Base\Blog\Twig;
 
 use Base\Blog\Controller\Client\CommentController;
 use Base\Blog\Entity\Post;
-use Base\Repository\Thread\CommentRepository;
+use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Screen\BlogScreens;
 use Base\Screen\Card;
@@ -26,7 +26,7 @@ final class BlogExtension extends AbstractExtension
 {
     public function __construct(
         private readonly PostRepository $posts,
-        private readonly CommentRepository $comments,
+        private readonly Comments $comments,
         private readonly CommentController $commentController,
         private readonly ?BlogScreens $screens = null,
     ) {

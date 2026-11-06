@@ -3,6 +3,11 @@
 ## [Unreleased]
 
 ### Changed
+- The comments are asked through the core's interface `Base\Repository\Thread\Comments`, not the class
+  `CommentRepository` (BlogController, CommentController, BlogScreens, BlogExtension, PendingCommentsWidgetType; omnibase's
+  plan "omnibase agnostic", step E2'). omnibase 5.0's interface declares `findVisible()`, `countVisible()`,
+  `countPending()` and `findPending()`; 4.x's has the interface, the container's alias of it and the repository with those
+  methods, which is what the container hands out, so the 4.x sites change nothing.
 - `Post::__toLink()` link through `Base\Contract\Link::to()` (the Urls contract; the same address under
   Symfony, in the core 3.x and 4.x) instead of BaseTrait's `getRouter()->generate()`, which the
   core deprecates since BaseTrait names contracts only (omnisense/omnibase 4.x, step F2f).

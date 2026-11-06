@@ -6,7 +6,7 @@ use Base\Blog\Entity\Post;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Service\CommentPolicy;
 use Base\Blog\Service\JsonLd;
-use Base\Repository\Thread\CommentRepository;
+use Base\Repository\Thread\Comments;
 use Base\Screen\Builder\Stories;
 use Base\Screen\Card;
 use Base\Screen\ContextProvider;
@@ -33,7 +33,7 @@ class BlogScreens
 
     public function __construct(
         private readonly PostRepository $posts,
-        private readonly CommentRepository $comments,
+        private readonly Comments $comments,
         private readonly Stories $stories,
         private readonly Urls $urls,
         private readonly ContextProvider $context,

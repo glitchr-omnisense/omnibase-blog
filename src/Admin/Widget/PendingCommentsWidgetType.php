@@ -4,7 +4,7 @@ namespace Base\Blog\Admin\Widget;
 
 use Base\Admin\Config\Menu\MenuItem;
 use Base\Admin\Widget\DashboardWidgetTypeInterface;
-use Base\Repository\Thread\CommentRepository;
+use Base\Repository\Thread\Comments;
 
 /**
  * The dashboard's tile: how many comments wait, the last few of them, each
@@ -13,7 +13,7 @@ use Base\Repository\Thread\CommentRepository;
  */
 final class PendingCommentsWidgetType implements DashboardWidgetTypeInterface
 {
-    public function __construct(private readonly CommentRepository $comments)
+    public function __construct(private readonly Comments $comments)
     {
     }
 

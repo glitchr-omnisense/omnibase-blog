@@ -5,7 +5,7 @@ namespace Base\Blog\Controller\Client;
 use Base\Attributes\Attribute\Sitemap;
 use Base\Blog\Screen\BlogScreens;
 use Base\Bridge\Symfony\ScreenResponder;
-use Base\Repository\Thread\CommentRepository;
+use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Service\JsonLd;
 use Base\Screen\View;
@@ -31,7 +31,7 @@ class BlogController extends AbstractController
 {
     public function __construct(
         private readonly PostRepository $posts,
-        private readonly CommentRepository $comments,
+        private readonly Comments $comments,
         #[Autowire('%blog.posts_per_page%')] private readonly int $perPage = 12,
         private readonly ?JsonLd $jsonLd = null,
         private readonly ?BlogScreens $screens = null,
