@@ -9,7 +9,7 @@ order: 10
 
 - PHP 8.2 or later;
 - doctrine/orm 2.15 or 3;
-- omnisense/omnibase 3.0 or 4.0, omnibridge/symfony 1.x, omnibase/admin;
+- omnisense/omnibase 3.0, 4.0 or 5.0, omnibridge/symfony 1.x, omnibase/admin;
 - league/flysystem 3 (the importer's pictures);
 - Symfony 6, 7 or 8 (config, console, dependency-injection, form,
   http-client, http-kernel, security-bundle, string);
