@@ -4,7 +4,7 @@ namespace Base\Blog\Tests\Service;
 
 use Base\Blog\Service\AkismetReporter;
 use Base\Entity\Thread\Comment;
-use Base\Routing\AdvancedRouterInterface;
+use Omnibridge\Symfony\Omnibase\Routing\AdvancedRouterInterface;
 use Base\Service\FormGuard;
 use Base\Service\ParameterBagInterface;
 use Base\Service\SettingBagInterface;

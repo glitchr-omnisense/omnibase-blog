@@ -3,7 +3,7 @@
 namespace Base\Blog\Controller\Client;
 
 use Base\Blog\Entity\Post;
-use Base\Form\Type\CommentType;
+use Omnibridge\Symfony\Omnibase\Form\Type\CommentType;
 use Base\Form\Model\CommentModel;
 use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;

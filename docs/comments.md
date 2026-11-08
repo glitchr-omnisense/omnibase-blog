@@ -15,8 +15,8 @@ repository or guard of its own - it uses the core's:
 |---|---|
 | `Base\Blog\Entity\Comment` (`blog_comment`, `post`) | `Base\Entity\Thread\Comment` (`threadComment`, `thread`) |
 | `Base\Blog\Enum\CommentState` | `Base\Enum\CommentState` |
-| `Base\Blog\Form\CommentType`, `Form\Model\CommentModel` | `Base\Form\Type\CommentType` (options `placeholders`, `trap_class`), `Base\Form\Model\CommentModel` |
-| `Base\Blog\Repository\CommentRepository` | `Base\Repository\Thread\CommentRepository` |
+| `Base\Blog\Form\CommentType`, `Form\Model\CommentModel` | `Omnibridge\Symfony\Omnibase\Form\Type\CommentType` (options `placeholders`, `trap_class`), `Base\Form\Model\CommentModel` |
+| `Base\Blog\Repository\CommentRepository` | `Omnibridge\Doctrine\Omnibase\Repository\Thread\CommentRepository` |
 | `Base\Blog\Service\CommentGuard` | `Base\Service\CommentGuard` (the blog passes its `min_delay` and `flood_interval`) |
 | `Post::getComments()`, `getVisibleComments()` | `blog_comments(post)`, `blog_comments_count(post)` in Twig, or the repository |
 
