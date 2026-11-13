@@ -2,6 +2,18 @@
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-11-13
+
+### Changed
+
+- Installs with the default minimum-stability: stable requirements (`omnisense/omnibase` ^5.1, `omnibridge/symfony` ^1.1, `omnibase/admin` ^1.0), a branch alias,
+  no `minimum-stability: dev` left to the sites.
+- CI: glitchr-studio/ci's package workflow (the bundle installed alone, composer validate, PHPUnit,
+  PHPStan against its baseline, a consumer install without require-dev) and its release workflow.
+- `doctrine/doctrine-bundle` required: the repository extends its `ServiceEntityRepository`.
+- Neutral example data in the tests (an invented WordPress recording) and a comment.
+- Two kernel tests skipped without a host no longer fail in their tearDown.
+
 ### Changed
 - Accepts omnisense/omnibase 5.0 (`3.0.*-dev || 4.0.*-dev || 5.0.*-dev`; plan "omnibase agnostic", step S): the bundle runs
   unchanged on it, `Base\Bundle\AbstractBaseBundle` and the other former names it uses being aliases of

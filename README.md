@@ -26,13 +26,22 @@ is on, Google reCAPTCHA v3 is added to the form as well.
 ## Install
 
 ```bash
-composer require omnibase/blog:dev-main
+composer require omnibase/blog
 ```
+
+Under Symfony it runs on the core's Symfony host: Composer brings `omnisense/omnibase` 5.1 and
+`omnibridge/symfony` with it; `config/bundles.php` registers the core's bundle before this one
+(see the core's README for the other bundles a site usually adds):
 
 ```php
 // config/bundles.php
+Omnibridge\Symfony\Omnibase\BaseBundle::class => ['all' => true],
+Base\Admin\AdminBundle::class => ['all' => true],
 Base\Blog\BlogBundle::class => ['all' => true],
 ```
+
+With the route below and the schema updated, `/chroniques` lists the published posts and
+`/chroniques/feed.xml` is their feed; a post written in the back office shows there.
 
 ```yaml
 # config/routes.yaml

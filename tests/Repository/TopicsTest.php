@@ -28,6 +28,11 @@ final class TopicsTest extends KernelTestCase
 
     protected function tearDown(): void
     {
+        if (!class_exists($_SERVER['KERNEL_CLASS']) || !class_exists('App\\Entity\\User')) {
+            parent::tearDown(); // skipped in setUp(): no kernel to clean up after
+
+            return;
+        }
         $em = $this->em();
         foreach ([1, 2] as $_) { // a thread removed once is in the bin (Trasheable), removed again it is gone
             $em->clear();

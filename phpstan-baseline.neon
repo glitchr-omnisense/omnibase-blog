@@ -1,0 +1,37 @@
+parameters:
+	ignoreErrors:
+		-
+			message: '#^Class App\\Entity\\User not found\.$#'
+			identifier: class.notFound
+			count: 2
+			path: src/Controller/Client/CommentController.php
+
+		-
+			message: '#^Parameter \$recaptcha of method Base\\Blog\\Controller\\Client\\CommentController\:\:__construct\(\) has invalid type Google\\Service\\GrService\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/Client/CommentController.php
+
+		-
+			message: '#^Property Base\\Blog\\Controller\\Client\\CommentController\:\:\$recaptcha has unknown class Google\\Service\\GrService as its type\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Controller/Client/CommentController.php
+
+		-
+			message: '#^Caught class Omnishield\\Exception\\OmnishieldException not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Service/AkismetReporter.php
+
+		-
+			message: '#^Class App\\Entity\\User not found\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Service/CommentNotifier.php
+
+		-
+			message: '#^Parameter \$user of anonymous function has invalid type App\\Entity\\User\.$#'
+			identifier: class.notFound
+			count: 1
+			path: src/Service/CommentNotifier.php

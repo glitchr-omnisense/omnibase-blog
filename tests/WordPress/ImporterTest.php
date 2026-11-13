@@ -17,7 +17,7 @@ use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
 
 /**
- * monicaneagoy.info read through its REST API (a recorded excerpt): every
+ * A WordPress site read through its REST API (an invented recording on blog.example): every
  * page of every list, the pages' paths, the HTML cleaned, the pictures
  * copied, the links rewritten, each item to its target - and a second run
  * with --update doubles nothing.
@@ -27,11 +27,11 @@ final class ImporterTest extends TestCase
     public function testTheClientFollowsEveryPage(): void
     {
         $site = new WordPressSite();
-        $pages = (new Client($site->client()))->all('https://monicaneagoy.info', 'pages');
+        $pages = (new Client($site->client()))->all('https://blog.example', 'pages');
 
         $this->assertCount(4, $pages);
         $this->assertCount(2, $site->requests, 'two to a page, two pages');
-        $this->assertSame('https://monicaneagoy.info/wp-json/wp/v2/', Client::api('https://monicaneagoy.info/'));
+        $this->assertSame('https://blog.example/wp-json/wp/v2/', Client::api('https://blog.example/'));
     }
 
     public function testTheHtmlIsCleaned(): void
@@ -42,16 +42,16 @@ final class ImporterTest extends TestCase
 
     public function testTheLinksFollowWhatWasImported(): void
     {
-        $links = new LinkRewriter('https://monicaneagoy.info', ['2014/05/book-a.jpg' => '/uploads/wordpress/2014/05/book-a.jpg'], [48 => '/biography'], ['about-me/biography' => '/biography', 'news/a-post' => '/chroniques/a-post']);
+        $links = new LinkRewriter('https://blog.example', ['2014/05/book-a.jpg' => '/uploads/wordpress/2014/05/book-a.jpg'], [48 => '/biography'], ['about-me/biography' => '/biography', 'news/a-post' => '/chroniques/a-post']);
 
-        $this->assertSame('/uploads/wordpress/2014/05/book-a.jpg', $links->to('https://monicaneagoy.info/wp-content/uploads/2014/05/book-a-150x206.jpg'));
-        $this->assertSame('/biography', $links->to('https://monicaneagoy.info/?page_id=48'));
-        $this->assertSame('/biography#yoga', $links->to('https://www.monicaneagoy.info/about-me/biography/#yoga'));
-        $this->assertSame('/chroniques/a-post', $links->to('https://monicaneagoy.info/2017/08/a-post/'));
-        $this->assertSame('/', $links->to('https://monicaneagoy.info/'));
-        $this->assertNull($links->to('https://www.corwin.com/books/Book235914'), 'another site');
-        $this->assertNull($links->to('https://monicaneagoy.info/?page_id=999'), 'a page not imported stays on the old site');
-        $this->assertSame('<a href="/biography">Bio</a>', $links->rewrite('<a href="https://monicaneagoy.info/?page_id=48">Bio</a>'));
+        $this->assertSame('/uploads/wordpress/2014/05/book-a.jpg', $links->to('https://blog.example/wp-content/uploads/2014/05/book-a-150x206.jpg'));
+        $this->assertSame('/biography', $links->to('https://blog.example/?page_id=48'));
+        $this->assertSame('/biography#yoga', $links->to('https://www.blog.example/about-me/biography/#yoga'));
+        $this->assertSame('/chroniques/a-post', $links->to('https://blog.example/2017/08/a-post/'));
+        $this->assertSame('/', $links->to('https://blog.example/'));
+        $this->assertNull($links->to('https://www.publisher.example/books/Book235914'), 'another site');
+        $this->assertNull($links->to('https://blog.example/?page_id=999'), 'a page not imported stays on the old site');
+        $this->assertSame('<a href="/biography">Bio</a>', $links->rewrite('<a href="https://blog.example/?page_id=48">Bio</a>'));
     }
 
     public function testAnImportRunTwiceDoublesNothing(): void
@@ -63,7 +63,7 @@ final class ImporterTest extends TestCase
         $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [$store, $posts, new SkipTarget()], $uploads);
 
         $map = ['about-me/biography' => 'page:bio', 'contact' => 'skip', 'about-me' => 'skip'];
-        $first = $importer->import('https://monicaneagoy.info', $map);
+        $first = $importer->import('https://blog.example', $map);
 
         $this->assertSame(2, $first->count(Result::CREATED, 'post'));
         $this->assertSame(2, $first->count(Result::CREATED, 'page'), 'the biography and the books');
@@ -76,25 +76,25 @@ final class ImporterTest extends TestCase
         $this->assertSame('services/books', $books->path());
         $this->assertStringContainsString('src="/uploads/wordpress/2014/05/book-a.jpg"', $books->content);
         $this->assertStringNotContainsString('hupso', $books->content);
-        $this->assertStringContainsString('href="http://www.corwin.com/books/Book235914"', $books->content, 'the publisher\'s link stays');
+        $this->assertStringContainsString('href="http://www.publisher.example/books/Book235914"', $books->content, 'the publisher\'s link stays');
         $bio = $store->items['biography'];
-        $this->assertSame('Biography of Monica Neagoy', $bio->title);
+        $this->assertSame('Biography of Jeanne Exemple', $bio->title);
         $this->assertStringContainsString('international consultant', $bio->text());
-        $post = $posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths'];
+        $post = $posts->items['jeanne-a-la-radio-une-methode-pour-les-maths'];
         $this->assertSame(['Radio/TV shows'], $post->categories);
         $this->assertSame('2018-02-15', $post->date->format('Y-m-d'));
         $this->assertSame(235, $post->featuredMedia);
         $this->assertSame('/uploads/wordpress/2014/05/book-a.jpg', $post->cover, 'the featured picture, where its copy is');
-        $this->assertNull($posts->items['review-of-monicas-unpacking-fractions-book']->cover, 'no featured picture, no cover');
+        $this->assertNull($posts->items['review-of-jeannes-fractions-book']->cover, 'no featured picture, no cover');
 
-        $second = $importer->import('https://monicaneagoy.info', $map, update: true);
+        $second = $importer->import('https://blog.example', $map, update: true);
         $this->assertSame(0, $second->count(Result::CREATED));
         $this->assertSame(4, $second->count(Result::UPDATED));
         $this->assertSame(0, $second->media, 'the pictures are there already');
         $this->assertCount(2, $posts->items);
         $this->assertCount(2, $store->items);
 
-        $third = $importer->import('https://monicaneagoy.info', $map);
+        $third = $importer->import('https://blog.example', $map);
         $this->assertSame(4, $third->count(Result::KEPT), 'without --update, left alone');
     }
 
@@ -104,10 +104,10 @@ final class ImporterTest extends TestCase
         $posts = new MemoryTarget('post');
         $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [$posts, new SkipTarget()]);
 
-        $importer->import('https://monicaneagoy.info', ['*page' => 'skip'], media: false);
+        $importer->import('https://blog.example', ['*page' => 'skip'], media: false);
 
-        $this->assertSame(235, $posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths']->featuredMedia);
-        $this->assertNull($posts->items['monica-sur-bmftv-une-methode-pour-assimiler-les-maths']->cover);
+        $this->assertSame(235, $posts->items['jeanne-a-la-radio-une-methode-pour-les-maths']->featuredMedia);
+        $this->assertNull($posts->items['jeanne-a-la-radio-une-methode-pour-les-maths']->cover);
     }
 
     public function testAnUnknownTargetIsRefused(): void
@@ -116,7 +116,7 @@ final class ImporterTest extends TestCase
         $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [new SkipTarget()]);
 
         $this->expectException(\InvalidArgumentException::class);
-        $importer->import('https://monicaneagoy.info', ['*post' => 'nowhere'], media: false);
+        $importer->import('https://blog.example', ['*post' => 'nowhere'], media: false);
     }
 }
 

@@ -6,7 +6,7 @@ use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpClient\Response\MockResponse;
 
 /**
- * monicaneagoy.info's REST API, as recorded (tests/Fixtures/wordpress: two
+ * A WordPress site's REST API (invented, on blog.example) (tests/Fixtures/wordpress: two
  * posts, four pages, two pictures, three categories), answered without a
  * network; each request asked for is kept.
  */
@@ -32,6 +32,6 @@ final class WordPressSite
             $slice = \array_slice($all, ($page - 1) * 2, 2);
 
             return new MockResponse(json_encode($slice), ['response_headers' => ['content-type' => 'application/json', 'x-wp-total' => (string) \count($all), 'x-wp-totalpages' => (string) max(1, (int) ceil(\count($all) / 2))]]);
-        }, 'https://monicaneagoy.info');
+        }, 'https://blog.example');
     }
 }

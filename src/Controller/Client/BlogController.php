@@ -25,7 +25,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * "omnibase agnostique", C5) to omnibase's ScreenResponder: the templates read
  * `screen` and `frame` alone, a front end gets the same data in JSON. The
  * variables the pages had before (the entities) are passed as well, for the
- * templates a site overrides (wineseller's post page): deprecated, gone in 4.0.
+ * templates a site overrides (a shop site's post page): deprecated, gone in 4.0.
  */
 class BlogController extends AbstractController
 {
