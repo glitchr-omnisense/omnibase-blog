@@ -2,6 +2,17 @@
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-11-14
+
+### Changed
+
+- The classes omnisense/omnibase 5.0 moved to omnibridge/symfony named by their new names:
+  `Omnibridge\Symfony\Omnibase\Bundle\{AbstractBaseBundle, AbstractBaseExtension, AbstractBaseConfiguration}`
+  in place of `Base\Bundle\*`, former names the core keeps only as aliases until 6.0. No behaviour change.
+- BlogPagesSnapshotTest probes `Omnibridge\Symfony\Omnibase\ScreenResponder`. Kept: `Base\Bridge\Symfony\ScreenResponder`
+  in BlogController and CommentController, an optional autowired service that omnibridge/symfony registers under
+  its former id only (its new name would be autowired null).
+
 ## [1.0.0] - 2026-11-13
 
 ### Changed

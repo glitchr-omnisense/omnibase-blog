@@ -2,7 +2,7 @@
 
 namespace Base\Blog\DependencyInjection;
 
-use Base\Bundle\AbstractBaseConfiguration;
+use Omnibridge\Symfony\Omnibase\Bundle\AbstractBaseConfiguration;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 
 class BlogConfiguration extends AbstractBaseConfiguration
