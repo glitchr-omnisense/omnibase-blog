@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [1.0.3] - 2026-11-14
+
+### Changed
+
+- AkismetReporterTest gives SpamChecker omnibridge/symfony's `StackRequests` (the `Requests` contract) in place
+  of a `RequestStack`, which omnisense/omnibase 6.0 no longer takes.
+- Accepts omnisense/omnibase 6.0: `omnisense/omnibase` ^5.1 || ^6.0, `omnibridge/symfony` ^1.1.2 || ^2.0. The
+  same code runs on both lines: it names no former name and no entry point 6.0 removed.
+
 ## [1.0.2] - 2026-11-14
 
 ### Changed

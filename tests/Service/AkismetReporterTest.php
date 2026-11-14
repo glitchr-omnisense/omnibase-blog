@@ -13,6 +13,7 @@ use Base\Service\TranslatorInterface;
 use Omnishield\Registry;
 use Omnishield\Testing\FixedGateway;
 use Omnishield\Testing\FixedGatewayFactory;
+use Omnibridge\Symfony\Contract\StackRequests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,7 +43,7 @@ final class AkismetReporterTest extends TestCase
         $translator->method('getLocale')->willReturn('fr');
         $translator->method('getFallbackLocales')->willReturn([]);
 
-        return new SpamChecker($requests, $this->createMock(SettingBagInterface::class), $this->createMock(ParameterBagInterface::class), $translator, new MockHttpClient(), false, new FormGuard('secret', ['classifier' => 'comments'], $registry), $router);
+        return new SpamChecker(new StackRequests($requests), $this->createMock(SettingBagInterface::class), $this->createMock(ParameterBagInterface::class), $translator, new MockHttpClient(), false, new FormGuard('secret', ['classifier' => 'comments'], $registry), $router);
     }
 
     private function comment(): Comment
