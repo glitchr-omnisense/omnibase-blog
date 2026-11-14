@@ -13,7 +13,7 @@
         "php": "^8.2",
         "doctrine/orm": "^2.15|^3.0",
         "doctrine/doctrine-bundle": "^2.13|^3.0",
-        "omnibridge/symfony": "^1.1",
+        "omnibridge/symfony": "^1.1.2",
         "omnisense/omnibase": "^5.1",
         "league/flysystem": "^3.0",
         "omnibase/admin": "^1.0",

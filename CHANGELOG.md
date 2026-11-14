@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-11-14
+
+### Changed
+
+- Requires `omnibridge/symfony` ^1.1.2, which registers each service it took over from the core under its new id as
+  well: `BlogController` and `CommentController` are typed on `Omnibridge\Symfony\Omnibase\ScreenResponder`, no
+  longer on its former name `Base\Bridge\Symfony\ScreenResponder` (an alias until omnisense/omnibase 6.0). The bundle
+  names no former name of the core any more. No behaviour change.
+
 ## [1.0.1] - 2026-11-14
 
 ### Changed

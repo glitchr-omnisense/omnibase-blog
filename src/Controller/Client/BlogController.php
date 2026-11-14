@@ -4,7 +4,7 @@ namespace Base\Blog\Controller\Client;
 
 use Base\Attributes\Attribute\Sitemap;
 use Base\Blog\Screen\BlogScreens;
-use Base\Bridge\Symfony\ScreenResponder;
+use Omnibridge\Symfony\Omnibase\ScreenResponder;
 use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Service\JsonLd;

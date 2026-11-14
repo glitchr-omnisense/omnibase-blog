@@ -11,7 +11,7 @@ use Base\Service\CommentGuard;
 use Base\Blog\Service\CommentNotifier;
 use Base\Blog\Service\CommentPolicy;
 use Base\Blog\Screen\BlogScreens;
-use Base\Bridge\Symfony\ScreenResponder;
+use Omnibridge\Symfony\Omnibase\ScreenResponder;
 use Base\Screen\View;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
