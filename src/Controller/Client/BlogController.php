@@ -4,7 +4,7 @@ namespace Base\Blog\Controller\Client;
 
 use Base\Attributes\Attribute\Sitemap;
 use Base\Blog\Screen\BlogScreens;
-use Omnibridge\Symfony\Omnibase\ScreenResponder;
+use Base\Screen\Responder;
 use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
 use Base\Blog\Service\JsonLd;
@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Attribute\Route;
  * blog.path ("chroniques" by default).
  *
  * Each action hands a template and its view model (Base\Blog\Screen\*, plan
- * "omnibase agnostique", C5) to omnibase's ScreenResponder: the templates read
+ * "omnibase agnostique", C5) to omnibase's screen responder (Base\Screen\Responder): the templates read
  * `screen` and `frame` alone, a front end gets the same data in JSON. The
  * variables the pages had before (the entities) are passed as well, for the
  * templates a site overrides (a shop site's post page): deprecated, gone in 4.0.
@@ -35,7 +35,7 @@ class BlogController extends AbstractController
         #[Autowire('%blog.posts_per_page%')] private readonly int $perPage = 12,
         private readonly ?JsonLd $jsonLd = null,
         private readonly ?BlogScreens $screens = null,
-        private readonly ?ScreenResponder $responder = null,
+        private readonly ?Responder $responder = null,
         private readonly ?CommentController $commenting = null,
     ) {
     }

@@ -11,7 +11,7 @@ use Base\Blog\WordPress\LinkRewriter;
 use Base\Blog\WordPress\Result;
 use Base\Blog\WordPress\Target\SkipTarget;
 use Base\Blog\WordPress\TargetInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\UnitOfWork;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use PHPUnit\Framework\TestCase;
@@ -60,7 +60,7 @@ final class ImporterTest extends TestCase
         $store = new MemoryTarget('page');
         $posts = new MemoryTarget('post');
         $uploads = new Filesystem(new LocalFilesystemAdapter(sys_get_temp_dir().'/blog-wordpress-'.bin2hex(random_bytes(4))));
-        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [$store, $posts, new SkipTarget()], $uploads);
+        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(UnitOfWork::class), $site->client(), [$store, $posts, new SkipTarget()], $uploads);
 
         $map = ['about-me/biography' => 'page:bio', 'contact' => 'skip', 'about-me' => 'skip'];
         $first = $importer->import('https://blog.example', $map);
@@ -102,7 +102,7 @@ final class ImporterTest extends TestCase
     {
         $site = new WordPressSite();
         $posts = new MemoryTarget('post');
-        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [$posts, new SkipTarget()]);
+        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(UnitOfWork::class), $site->client(), [$posts, new SkipTarget()]);
 
         $importer->import('https://blog.example', ['*page' => 'skip'], media: false);
 
@@ -113,7 +113,7 @@ final class ImporterTest extends TestCase
     public function testAnUnknownTargetIsRefused(): void
     {
         $site = new WordPressSite();
-        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(EntityManagerInterface::class), $site->client(), [new SkipTarget()]);
+        $importer = new Importer(new Client($site->client()), new Cleaner(), $this->createStub(UnitOfWork::class), $site->client(), [new SkipTarget()]);
 
         $this->expectException(\InvalidArgumentException::class);
         $importer->import('https://blog.example', ['*post' => 'nowhere'], media: false);

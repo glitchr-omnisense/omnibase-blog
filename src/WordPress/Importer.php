@@ -2,7 +2,7 @@
 
 namespace Base\Blog\WordPress;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\UnitOfWork;
 use League\Flysystem\FilesystemOperator;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
@@ -27,7 +27,7 @@ class Importer
     public function __construct(
         private readonly Client $client,
         private readonly Cleaner $cleaner,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
         private readonly HttpClientInterface $http,
         #[AutowireIterator('blog.wordpress_target')] iterable $targets = [],
         #[Autowire(service: 'local.uploads')] private readonly ?FilesystemOperator $uploads = null,
@@ -144,7 +144,7 @@ class Importer
             $item->content = $links->rewrite($item->content);
             $result->add($routes[$item->id]->getName(), $routes[$item->id]->import($item, $context));
         }
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
 
         return $result;
     }

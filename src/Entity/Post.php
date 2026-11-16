@@ -9,7 +9,7 @@ use Base\Database\Attribute\Uploader;
 use Base\Entity\Thread;
 use Base\Enum\ThreadState;
 use Base\Service\Model\LinkableInterface;
-use Doctrine\ORM\Mapping as ORM;
+use Base\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 

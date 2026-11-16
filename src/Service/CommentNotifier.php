@@ -5,7 +5,10 @@ namespace Base\Blog\Service;
 use App\Entity\User;
 use Base\Entity\Thread\Comment;
 use Base\Entity\User\Notification;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Database\Repository\Finder\Criterion;
+use Base\Database\Repository\Finder\Group;
+use Base\Database\Repository\Finder\Parser;
+use Base\Database\Repository\Repositories;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Role\RoleHierarchyInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -18,7 +21,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
 final class CommentNotifier
 {
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly Repositories $repositories,
         private readonly RoleHierarchyInterface $roles,
         private readonly UrlGeneratorInterface $urls,
         private readonly TranslatorInterface $translator,
@@ -47,9 +50,8 @@ final class CommentNotifier
     /** @return list<User> */
     private function administrators(): array
     {
-        $users = $this->entityManager->getRepository(User::class)->createQueryBuilder('u')
-            ->where('u.roles <> :member')->setParameter('member', 'ROLE_USER')
-            ->getQuery()->getResult();
+        // Every account above a plain member (roles <> 'ROLE_USER'), then those who reach ROLE_ADMIN.
+        $users = $this->repositories->of(User::class)->findBy([Group::of(Parser::SEPARATOR_AND, Criterion::of('roles', 'ROLE_USER', Parser::OPTION_NOT_EQUAL))]);
 
         return array_values(array_filter($users, fn (User $user) => \in_array('ROLE_ADMIN', $this->roles->getReachableRoleNames($user->getRoles()), true)));
     }

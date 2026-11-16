@@ -142,7 +142,7 @@ final class BlogPagesSnapshotTest extends KernelTestCase
      */
     public function testTheBlogsScreensAreGivenAsData(): void
     {
-        if (!class_exists(Runtime::class) || !class_exists('Omnibridge\\Symfony\\Omnibase\\ScreenResponder')) {
+        if (!class_exists(Runtime::class) || !interface_exists('Base\\Screen\\Responder')) {
             self::markTestSkipped('Needs omnisense/omnibase with the screens (C5).');
         }
         $this->seed();

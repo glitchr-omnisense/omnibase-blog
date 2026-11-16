@@ -12,7 +12,7 @@ use Base\Screen\Card;
 use Base\Screen\ContextProvider;
 use Base\Screen\Discussion;
 use Base\Screen\Shape;
-use Omnibridge\Contract\Urls;
+use Base\Contract\Urls;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 
 /**

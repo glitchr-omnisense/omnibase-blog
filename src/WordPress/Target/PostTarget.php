@@ -9,8 +9,9 @@ use Base\Blog\WordPress\Result;
 use Base\Blog\WordPress\TargetInterface;
 use Base\Entity\Thread;
 use Base\Entity\Thread\Tag;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Database\Repository\Repositories;
 use League\Flysystem\FilesystemOperator;
+use Base\Contract\UnitOfWork;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
@@ -29,7 +30,8 @@ final class PostTarget implements TargetInterface
     private array $slugs = [];
 
     public function __construct(
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
+        private readonly Repositories $repositories,
         private readonly UrlGeneratorInterface $urls,
         #[Autowire(service: 'local.uploads')] private readonly ?FilesystemOperator $uploads = null,
     ) {
@@ -48,7 +50,7 @@ final class PostTarget implements TargetInterface
     public function import(Item $item, Context $context): string
     {
         $slug = $this->slugFor($item);
-        $post = $this->entityManager->getRepository(Post::class)->findOneBy(['slug' => $slug]);
+        $post = $this->repositories->of(Post::class)->findOneBy(['slug' => $slug]);
         if ($post && !$context->update) {
             return Result::KEPT;
         }
@@ -69,7 +71,7 @@ final class PostTarget implements TargetInterface
         if (!$post->hasCover() && ($cover = $this->coverFile($item))) {
             $post->setCover($cover);
         }
-        $this->entityManager->persist($post);
+        $this->unitOfWork->persist($post);
 
         return $result;
     }
@@ -116,7 +118,7 @@ final class PostTarget implements TargetInterface
             return $this->slugs[$item->id];
         }
         try {
-            $holder = $this->entityManager->getRepository(Thread::class)->findOneBy(['slug' => $slug]);
+            $holder = $this->repositories->of(Thread::class)->findOneBy(['slug' => $slug]);
         } catch (\Throwable) {
             $holder = null;
         }
@@ -136,13 +138,13 @@ final class PostTarget implements TargetInterface
             return null;
         }
         $slug = (new AsciiSlugger())->slug($label)->lower()->toString();
-        $tags = $this->entityManager->getRepository(Tag::class);
+        $tags = $this->repositories->of(Tag::class);
         $tag = $tags->findOneBy(['slug' => $slug]);
         if (!$tag) {
             $tag = new Tag($label, $slug);
-            $this->entityManager->persist($tag);
+            $this->unitOfWork->persist($tag);
             // Its id first: Thread::$tags is ordered (an #[OrderColumn]).
-            $this->entityManager->flush();
+            $this->unitOfWork->flush();
         }
 
         return $tag;

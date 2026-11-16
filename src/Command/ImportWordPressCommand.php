@@ -4,7 +4,7 @@ namespace Base\Blog\Command;
 
 use Base\Blog\WordPress\Importer;
 use Base\Blog\WordPress\Result;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Database\Repository\Repositories;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -31,7 +31,7 @@ final class ImportWordPressCommand extends Command
 {
     public function __construct(
         private readonly Importer $importer,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly Repositories $repositories,
     ) {
         parent::__construct();
     }
@@ -74,7 +74,7 @@ final class ImportWordPressCommand extends Command
         if ($username = $input->getOption('author')) {
             // The application's user (App\Entity\User holds the username), else omnibase's.
             $class = class_exists('App\\Entity\\User') ? 'App\\Entity\\User' : \Base\Entity\User::class;
-            $author = $this->entityManager->getRepository($class)->findOneBy(['username' => $username]);
+            $author = $this->repositories->of($class)->findOneBy(['username' => $username]);
             if (!$author) {
                 $io->warning(sprintf('No user "%s": what is created has no author.', $username));
             }

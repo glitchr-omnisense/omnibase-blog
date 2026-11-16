@@ -3,50 +3,50 @@
 namespace Base\Blog\Repository;
 
 use Base\Blog\Entity\Post;
+use Base\Database\Repository\Finder\Criterion;
+use Base\Database\Repository\Finder\Group;
+use Base\Database\Repository\Finder\Parser;
+use Base\Database\Repository\Repositories;
 use Base\Entity\Thread\Tag;
 use Base\Enum\ThreadState;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
+use Base\Database\Repository\Finders;
+use Base\Database\Repository\ServiceEntityRepository;
 
-/** @extends ServiceEntityRepository<Post> */
+/**
+ * The chronicles, on omnibase's finder language: the same queries whatever persistence runs them.
+ *
+ * @method Post|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Post|null findOneBy(array $criteria, ?array $orderBy = null)
+ * @method Post[]    findAll()
+ * @method Post[]    findBy(array $criteria, ?array $orderBy = null, $limit = null, $offset = null)
+ */
 class PostRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(Finders $finders, private readonly Repositories $repositories)
     {
-        parent::__construct($registry, Post::class);
+        parent::__construct($finders, Post::class);
     }
 
     /**
      * A page of the published posts, newest first - of one topic when a tag
      * slug is given, of one taxon (a level, a subject) when a taxon slug is.
-     * Paged by hand: Doctrine's Paginator walks the SQL with an output walker
-     * omnibase's own SqlWalker is incompatible with.
      *
      * @return list<Post>
      */
     public function findPublishedPage(int $page = 1, int $perPage = 10, ?string $tag = null, ?string $taxon = null): array
     {
-        return $this->filtered($this->published(), $tag, $taxon)
-            ->orderBy('p.publishedAt', 'DESC')->addOrderBy('p.id', 'DESC')
-            ->setFirstResult(max(0, $page - 1) * $perPage)
-            ->setMaxResults($perPage)
-            ->getQuery()->getResult();
+        return $this->findBy($this->filtered($this->published(), $tag, $taxon), ['publishedAt' => 'DESC', 'id' => 'DESC'], $perPage, max(0, $page - 1) * $perPage);
     }
 
     public function countPublished(?string $tag = null, ?string $taxon = null): int
     {
-        return (int) $this->filtered($this->published(), $tag, $taxon)
-            ->select('COUNT(DISTINCT p.id)')
-            ->getQuery()->getSingleScalarResult();
+        return $this->count($this->filtered($this->published(), $tag, $taxon));
     }
 
     /** @return list<Post> every published post, newest first: for a sitemap */
     public function findAllPublished(): array
     {
-        return $this->published()
-            ->orderBy('p.publishedAt', 'DESC')->addOrderBy('p.id', 'DESC')
-            ->getQuery()->getResult();
+        return $this->findBy($this->published(), ['publishedAt' => 'DESC', 'id' => 'DESC']);
     }
 
     /** @return list<Post> */
@@ -58,56 +58,51 @@ class PostRepository extends ServiceEntityRepository
     /** The featured post, or the newest one. */
     public function findHeadline(): ?Post
     {
-        return $this->published()
-            ->orderBy('p.featured', 'DESC')->addOrderBy('p.publishedAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()->getOneOrNullResult();
+        return $this->findOneBy($this->published(), ['featured' => 'DESC', 'publishedAt' => 'DESC']);
     }
 
     public function findOnePublished(string $slug): ?Post
     {
-        return $this->published()
-            ->andWhere('p.slug = :slug')->setParameter('slug', $slug)
-            ->getQuery()->getOneOrNullResult();
+        return $this->findOneBy([...$this->published(), 'slug' => $slug]);
     }
 
     /** @return array{0: ?Post, 1: ?Post} the older one, the newer one */
     public function findNeighbours(Post $post): array
     {
-        $older = $this->published()
-            ->andWhere('p.publishedAt < :at')->setParameter('at', $post->getPublishedAt())
-            ->orderBy('p.publishedAt', 'DESC')->setMaxResults(1)
-            ->getQuery()->getOneOrNullResult();
-        $newer = $this->published()
-            ->andWhere('p.publishedAt > :at')->setParameter('at', $post->getPublishedAt())
-            ->orderBy('p.publishedAt', 'ASC')->setMaxResults(1)
-            ->getQuery()->getOneOrNullResult();
+        $at = $post->getPublishedAt();
+        $older = $this->findOneBy([...$this->published(), Group::of(Parser::SEPARATOR_AND, Criterion::of('publishedAt', $at, Parser::OPTION_LOWER))], ['publishedAt' => 'DESC']);
+        $newer = $this->findOneBy([...$this->published(), Group::of(Parser::SEPARATOR_AND, Criterion::of('publishedAt', $at, Parser::OPTION_GREATER))], ['publishedAt' => 'ASC']);
 
         return [$older, $newer];
     }
 
-    /** @return list<Tag> the topics of the posts on the site: published, and their publication date come */
+    /**
+     * The topics of the posts on the site: published, and their publication date come - the tags of
+     * the published posts, highest priority first, then by slug, each once.
+     *
+     * @return list<Tag>
+     */
     public function findTopics(): array
     {
-        return $this->getEntityManager()->getRepository(Tag::class)->createQueryBuilder('t')
-            ->innerJoin('t.threads', 'p')
-            ->andWhere('p INSTANCE OF :class')->setParameter('class', $this->getClassMetadata()->discriminatorValue)
-            ->andWhere('p.state = :published')->setParameter('published', ThreadState::PUBLISH)
-            ->andWhere('p.publishedAt IS NULL OR p.publishedAt <= CURRENT_TIMESTAMP()') // as published(): a post scheduled for later is not on the site yet
-            ->groupBy('t.id')
-            ->orderBy('t.priority', 'DESC')->addOrderBy('t.slug', 'ASC')
-            ->getQuery()->getResult();
+        $posts = $this->findBy($this->published());
+        if (!$posts) {
+            return [];
+        }
+
+        $topics = [];
+        foreach ($this->repositories->of(Tag::class)->findBy(['threads' => $posts], ['priority' => 'DESC', 'slug' => 'ASC']) as $tag) {
+            $topics[spl_object_id($tag)] ??= $tag;
+        }
+
+        return array_values($topics);
     }
 
     /** The published posts, by year then month, for the chronicle's archive. @return array<int, array<int, int>> year => month => count */
     public function countByMonth(): array
     {
-        $rows = $this->published()
-            ->select('p.publishedAt AS at')
-            ->getQuery()->getArrayResult();
         $months = [];
-        foreach ($rows as $row) {
-            $at = $row['at'] instanceof \DateTimeInterface ? $row['at'] : new \DateTime((string) $row['at']);
+        foreach ($this->findBy($this->published()) as $post) {
+            $at = $post->getPublishedAt() ?? new \DateTime(); // as before: a post without a date counted under this month
             $months[(int) $at->format('Y')][(int) $at->format('n')] = ($months[(int) $at->format('Y')][(int) $at->format('n')] ?? 0) + 1;
         }
         krsort($months);
@@ -120,29 +115,42 @@ class PostRepository extends ServiceEntityRepository
     {
         $from = new \DateTimeImmutable(sprintf('%04d-%02d-01', $year, $month));
 
-        return $this->published()
-            ->andWhere('p.publishedAt >= :from AND p.publishedAt < :to')
-            ->setParameter('from', $from)->setParameter('to', $from->modify('+1 month'))
-            ->orderBy('p.publishedAt', 'DESC')
-            ->getQuery()->getResult();
+        return $this->findBy([...$this->published(), Group::of(Parser::SEPARATOR_AND,
+            Criterion::of('publishedAt', $from, Parser::OPTION_GREATER_EQUAL),
+            Criterion::of('publishedAt', $from->modify('+1 month'), Parser::OPTION_LOWER),
+        )], ['publishedAt' => 'DESC']);
     }
 
-    private function filtered(QueryBuilder $query, ?string $tag, ?string $taxon): QueryBuilder
+    /**
+     * @param array<int|string, mixed> $criteria
+     *
+     * @return array<int|string, mixed>
+     */
+    private function filtered(array $criteria, ?string $tag, ?string $taxon): array
     {
         if ($tag) {
-            $query->innerJoin('p.tags', 't')->andWhere('t.slug = :tag')->setParameter('tag', $tag);
+            $criteria['tags.slug'] = $tag;
         }
         if ($taxon) {
-            $query->innerJoin('p.taxa', 'x')->andWhere('x.slug = :taxon')->setParameter('taxon', $taxon);
+            $criteria['taxa.slug'] = $taxon;
         }
 
-        return $query;
+        return $criteria;
     }
 
-    private function published(): QueryBuilder
+    /**
+     * The criteria of the posts on the site: published, and their publication date come (none, or now or before).
+     *
+     * @return array<int|string, mixed>
+     */
+    private function published(): array
     {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.state = :published')->setParameter('published', ThreadState::PUBLISH)
-            ->andWhere('p.publishedAt IS NULL OR p.publishedAt <= CURRENT_TIMESTAMP()');
+        return [
+            'state' => ThreadState::PUBLISH,
+            Group::of(Parser::SEPARATOR_OR,
+                Criterion::of('publishedAt', null, Parser::OPTION_NULL),
+                Criterion::of('publishedAt', new \DateTime(), Parser::OPTION_LOWER_EQUAL),
+            ),
+        ];
     }
 }

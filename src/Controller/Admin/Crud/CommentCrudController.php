@@ -18,7 +18,6 @@ use Base\Field\IdField;
 use Base\Field\SelectField;
 use Base\Field\TextareaField;
 use Base\Field\TextField;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Contracts\Service\Attribute\Required;
 
@@ -102,7 +101,7 @@ class CommentCrudController extends AbstractCrudController
         $comment = $this->findEntity($entityId);
         $wasSpam = CommentState::SPAM === $comment->getState();
         $comment->approve();
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
         // Held as spam, now approved: Akismet is told it was ham.
         if ($wasSpam || ($comment->getSpamScore() ?? 0) > 0) {
             $this->akismet->reportHam($comment);
@@ -119,7 +118,7 @@ class CommentCrudController extends AbstractCrudController
         $comment = $this->findEntity($entityId);
         $letThrough = $comment->isVisible();
         $comment->markAsSpam();
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
         if ($letThrough || 0 === ($comment->getSpamScore() ?? 0)) {
             $this->akismet->reportSpam($comment);
         }
@@ -134,7 +133,7 @@ class CommentCrudController extends AbstractCrudController
         /** @var Comment $comment */
         $comment = $this->findEntity($entityId);
         $comment->trash();
-        $this->entityManager->flush();
+        $this->unitOfWork->flush();
         $this->addFlash('success', '@blog.admin.comment.flash.trashed');
 
         return $this->redirectToIndex();

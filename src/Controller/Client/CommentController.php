@@ -3,17 +3,17 @@
 namespace Base\Blog\Controller\Client;
 
 use Base\Blog\Entity\Post;
-use Omnibridge\Symfony\Omnibase\Form\Type\CommentType;
+use Base\Form\Type\CommentType;
 use Base\Form\Model\CommentModel;
 use Base\Repository\Thread\Comments;
 use Base\Blog\Repository\PostRepository;
+use Base\Contract\UnitOfWork;
 use Base\Service\CommentGuard;
 use Base\Blog\Service\CommentNotifier;
 use Base\Blog\Service\CommentPolicy;
 use Base\Blog\Screen\BlogScreens;
-use Omnibridge\Symfony\Omnibase\ScreenResponder;
+use Base\Screen\Responder;
 use Base\Screen\View;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Form\FormError;
@@ -35,7 +35,7 @@ class CommentController extends AbstractController
     public function __construct(
         private readonly PostRepository $posts,
         private readonly Comments $comments,
-        private readonly EntityManagerInterface $entityManager,
+        private readonly UnitOfWork $unitOfWork,
         private readonly CommentGuard $guard,
         private readonly CommentNotifier $notifier,
         private readonly TranslatorInterface $translator,
@@ -51,7 +51,7 @@ class CommentController extends AbstractController
         // Who may write and answer (the same blog.comments.* settings), and the pages shown again with a form's errors.
         private ?CommentPolicy $policy = null,
         private readonly ?BlogScreens $screens = null,
-        private readonly ?ScreenResponder $responder = null,
+        private readonly ?Responder $responder = null,
     ) {
         $this->policy ??= new CommentPolicy($this->enabled, $this->guestAllowed, $this->guestReplies);
     }
@@ -149,8 +149,8 @@ class CommentController extends AbstractController
                     $comment->setParent($parent);
                 }
             }
-            $this->entityManager->persist($comment);
-            $this->entityManager->flush();
+            $this->unitOfWork->persist($comment);
+            $this->unitOfWork->flush();
             $this->notifier->commentLeft($comment);
             $this->addFlash('blog', $comment->isVisible() ? 'comment.flash.published' : 'comment.flash.pending');
 

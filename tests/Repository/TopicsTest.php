@@ -3,8 +3,13 @@
 namespace Tests\Base\Blog\Repository;
 
 use Base\Blog\Entity\Post;
+use Base\Blog\Repository\PostRepository;
 use Base\Entity\Thread\Tag;
-use Doctrine\ORM\EntityManagerInterface;
+use Base\Contract\Backend;
+use Base\Contract\UnitOfWork;
+use Base\Database\Attribute\Backend\Backends;
+use Base\Database\Repository\Repositories;
+use Base\Database\Scope\TrashScope;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 /**
@@ -34,13 +39,15 @@ final class TopicsTest extends KernelTestCase
             return;
         }
         $em = $this->em();
+        $repositories = static::getContainer()->get(Repositories::class);
         foreach ([1, 2] as $_) { // a thread removed once is in the bin (Trasheable), removed again it is gone
-            $em->clear();
-            if ($em->getFilters()->isEnabled('trash_filter')) {
-                $em->getFilters()->disable('trash_filter');
+            $repositories->of(Post::class)->clear();
+            $backend = Backends::of($em, Backend::class);
+            if ($backend->isScopeEnabled(TrashScope::NAME)) {
+                $backend->disableScope(TrashScope::NAME);
             }
             foreach (array_reverse($this->created) as [$class, $id]) {
-                if (null !== $entity = $em->find($class, $id)) {
+                if (null !== $entity = $repositories->of($class)->find($id)) {
                     $em->remove($entity);
                     $em->flush();
                 }
@@ -50,9 +57,9 @@ final class TopicsTest extends KernelTestCase
         parent::tearDown();
     }
 
-    private function em(): EntityManagerInterface
+    private function em(): UnitOfWork
     {
-        return static::getContainer()->get('doctrine')->getManager();
+        return static::getContainer()->get(UnitOfWork::class);
     }
 
     public function testAScheduledPostsTopicIsNotListedYet(): void
@@ -86,7 +93,7 @@ final class TopicsTest extends KernelTestCase
             $this->created[] = [Post::class, $post->getId()];
         }
 
-        $slugs = array_map(static fn (Tag $t) => $t->getSlug(), $em->getRepository(Post::class)->findTopics());
+        $slugs = array_map(static fn (Tag $t) => $t->getSlug(), static::getContainer()->get(PostRepository::class)->findTopics());
         self::assertContains($now->getSlug(), $slugs);
         self::assertNotContains($later->getSlug(), $slugs, 'scheduled for later: not on the site yet');
     }

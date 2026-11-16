@@ -4,7 +4,7 @@ namespace Base\Blog\Tests\Service;
 
 use Base\Blog\Service\AkismetReporter;
 use Base\Entity\Thread\Comment;
-use Omnibridge\Symfony\Omnibase\Routing\AdvancedRouterInterface;
+use Base\Routing\AdvancedRouterInterface;
 use Base\Service\FormGuard;
 use Base\Service\ParameterBagInterface;
 use Base\Service\SettingBagInterface;
@@ -13,7 +13,7 @@ use Base\Service\TranslatorInterface;
 use Omnishield\Registry;
 use Omnishield\Testing\FixedGateway;
 use Omnishield\Testing\FixedGatewayFactory;
-use Omnibridge\Symfony\Contract\StackRequests;
+use Base\Contract\Requests;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpClient\MockHttpClient;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,7 +43,34 @@ final class AkismetReporterTest extends TestCase
         $translator->method('getLocale')->willReturn('fr');
         $translator->method('getFallbackLocales')->willReturn([]);
 
-        return new SpamChecker(new StackRequests($requests), $this->createMock(SettingBagInterface::class), $this->createMock(ParameterBagInterface::class), $translator, new MockHttpClient(), false, new FormGuard('secret', ['classifier' => 'comments'], $registry), $router);
+        return new SpamChecker(self::requests($requests->getCurrentRequest()), $this->createMock(SettingBagInterface::class), $this->createMock(ParameterBagInterface::class), $translator, new MockHttpClient(), false, new FormGuard('secret', ['classifier' => 'comments'], $registry), $router);
+    }
+
+    /**
+     * The request being answered, as the core's Requests contract reads it: the visitor's address, headers and
+     * address asked (the host's adapter, a container service, is not built here: no kernel).
+     */
+    private static function requests(Request $request): Requests
+    {
+        return new class($request) implements Requests {
+            public function __construct(private readonly Request $request)
+            {
+            }
+
+            public function has(): bool { return true; }
+            public function ip(): ?string { return $this->request->getClientIp(); }
+            public function header(string $name): ?string { return $this->request->headers->get($name); }
+            public function uri(): ?string { return $this->request->getUri(); }
+            public function host(): ?string { return $this->request->getSchemeAndHttpHost(); }
+            public function route(): ?string { return $this->request->attributes->get('_route'); }
+            public function attribute(string $name, mixed $default = null): mixed { return $this->request->attributes->get($name, $default); }
+            public function session(string $key, mixed $default = null): mixed { return $default; }
+            public function remember(string $key, mixed $value): void {}
+            public function forget(string $key): void {}
+            public function flash(string $type, string $message): void {}
+            public function flashes(): array { return []; }
+            public function request(): ?object { return $this->request; }
+        };
     }
 
     private function comment(): Comment
